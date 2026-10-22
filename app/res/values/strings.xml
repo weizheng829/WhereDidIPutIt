@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">收哪了</string>
+    <string name="app_slogan">家里东西收哪了？拍下来，点一点，就找到</string>
+
+    <!-- 首页 -->
+    <string name="main_empty">还没有收纳空间\n点击右下角 ＋ 创建一个</string>
+    <string name="cd_open_menu">打开菜单</string>
+    <string name="cd_new_space">新建收纳空间</string>
+
+    <!-- 层级页 -->
+    <string name="cd_back">返回上一级</string>
+    <string name="cd_more">更多操作</string>
+    <string name="cd_add_photo">添加照片</string>
+    <string name="add_photo">添加照片</string>
+    <string name="add_hotspot">添加交互点</string>
+    <string name="cancel_placing">取消放置</string>
+    <string name="first_photo">拍第一张照片</string>
+    <string name="hint_placing">放置模式：点击照片上的目标位置（如某个抽屉），为它命名即可创建交互点</string>
+    <string name="node_empty_title">这个位置还没有照片</string>
+    <string name="node_empty_body">先拍一张这里的外观照（柜子、抽屉、箱子…）\n然后在照片上放置交互点，逐层记录</string>
+    <string name="photo_desc">第 %1$d 张照片</string>
+
+    <!-- 关于页 -->
+    <string name="about_title">关于与联系</string>
+    <string name="about_tagline">拍照 + 照片上的交互点，逐层记录家里东西收哪了。\n完全离线 · 不联网 · 不申请任何权限 · 开源免费</string>
+    <string name="about_contact">作者与联系</string>
+    <string name="label_author">作者</string>
+    <string name="label_email">邮箱（问题反馈 / 建议）</string>
+    <string name="btn_copy">复制</string>
+    <string name="btn_mail">发邮件</string>
+    <string name="about_qq_title">QQ 交流群</string>
+    <string name="about_qq_sub">扫码进群，交流用法、反馈问题、催更功能</string>
+    <string name="about_donate_title">赞助支持</string>
+    <string name="about_donate_sub">如果这个小工具帮到了你，可以请作者喝杯咖啡 ☕\n（微信 / 支付宝扫一扫）</string>
+    <string name="about_license_title">开源协议</string>
+    <string name="about_license_sub">本应用以 MIT 协议开源：可自由使用、修改和分发，需保留版权声明。</string>
+    <string name="btn_license">查看 MIT 协议全文</string>
+</resources>

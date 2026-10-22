@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 品牌青色系 -->
+    <color name="primary">#00897B</color>
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="primaryDeep">#00695C</color>
+    <color name="primaryContainer">#C6EDE8</color>
+    <color name="onPrimaryContainer">#075E56</color>
+    <color name="accent">#FF7043</color>
+    <color name="accentDeep">#BF360C</color>
+
+    <!-- 表面与文字 -->
+    <color name="surface">#F2F5F4</color>
+    <color name="cardBg">#FFFFFF</color>
+    <color name="onSurface">#1C2321</color>
+    <color name="onSurfaceVariant">#5C6865</color>
+    <color name="outlineVariant">#E2E8E6</color>
+    <color name="divider">#E2E8E6</color>
+
+    <!-- 头部 / 系统栏 -->
+    <color name="headerBg">#00897B</color>
+    <color name="onHeader">#FFFFFF</color>
+    <color name="onHeaderDim">#B3FFFFFF</color>
+    <color name="onHeaderFaint">#80FFFFFF</color>
+    <color name="statusBarBg">#00695C</color>
+    <color name="navBarBg">#00695C</color>
+    <color name="scrim">#B3000000</color>
+
+    <!-- 照片区（深浅色一致） -->
+    <color name="photoBg">#1C1C1C</color>
+    <color name="stripBg">#121212</color>
+
+    <!-- 功能色 -->
+    <color name="hintBarBg">#FFF3E0</color>
+    <color name="hintBarText">#BF360C</color>
+    <color name="chipBg">#D8EFEB</color>
+    <color name="chipText">#085E56</color>
+    <color name="tileLetter">#0B3F3A</color>
+    <color name="dialogAccent">#00897B</color>
+    <color name="controlHighlight">#1E00897B</color>
+    <color name="arrowDim">#C6CDCB</color>
+    <color name="crumbPillStroke">#00000000</color>
+
+    <!-- 侧边栏菜单图标 -->
+    <color name="iconBackup">#1E88E5</color>
+    <color name="iconSettings">#F57C00</color>
+    <color name="iconAbout">#E91E63</color>
+</resources>

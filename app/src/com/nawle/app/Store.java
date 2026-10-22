@@ -1,0 +1,407 @@
+package com.nawle.app;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 数据层：节点树 + 图片 + 交互点，全部存于应用私有目录，无需任何权限。
+ */
+public class Store {
+
+    public static class Node {
+        public long id;
+        public long parentId;
+        public String name;
+        public String note;
+    }
+
+    public static class Pic {
+        public long id;
+        public String file;
+        public String thumb;
+    }
+
+    public static class Hotspot {
+        public long id;
+        public long childId;
+        public float x;
+        public float y;
+        public String childName;
+    }
+
+    private static Store sInstance;
+
+    public static synchronized Store get(Context ctx) {
+        if (sInstance == null) sInstance = new Store(ctx.getApplicationContext());
+        return sInstance;
+    }
+
+    /** 导出备份前调用：把 WAL 日志写回主 db 文件，保证复制到的主文件完整 */
+    public void checkpoint() {
+        try {
+            w().execSQL("PRAGMA wal_checkpoint(TRUNCATE)");
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** 导入备份后调用：关闭并丢弃单例，下次 get() 重新打开 */
+    public static synchronized void reset() {
+        if (sInstance != null) {
+            try {
+                sInstance.db.close();
+            } catch (Throwable ignored) {
+            }
+            sInstance = null;
+        }
+    }
+
+    /** 清空全部数据（节点、图片、交互点及图片文件），用于设置里的"恢复初始状态" */
+    public void wipeAll() {
+        SQLiteDatabase d = w();
+        d.execSQL("DELETE FROM hotspots");
+        d.execSQL("DELETE FROM images");
+        d.execSQL("DELETE FROM nodes");
+        for (File dir : new File[]{imgDir, thumbDir, pendingDir}) {
+            File[] fs = dir.listFiles();
+            if (fs != null) for (File f : fs) f.delete();
+        }
+    }
+
+    private final Db db;
+    public final File imgDir;
+    public final File thumbDir;
+    public final File pendingDir;
+
+    private Store(Context ctx) {
+        db = new Db(ctx);
+        File files = ctx.getFilesDir();
+        imgDir = new File(files, "images");
+        thumbDir = new File(files, "thumbs");
+        pendingDir = new File(files, "pending");
+        imgDir.mkdirs();
+        thumbDir.mkdirs();
+        pendingDir.mkdirs();
+    }
+
+    private SQLiteDatabase r() {
+        return db.getReadableDatabase();
+    }
+
+    private SQLiteDatabase w() {
+        return db.getWritableDatabase();
+    }
+
+    // ---------------- 节点 ----------------
+
+    public long createNode(long parentId, String name) {
+        ContentValues v = new ContentValues();
+        v.put("parent_id", parentId);
+        v.put("name", name);
+        v.put("note", "");
+        v.put("created_at", System.currentTimeMillis());
+        return w().insert("nodes", null, v);
+    }
+
+    public void renameNode(long id, String name) {
+        ContentValues v = new ContentValues();
+        v.put("name", name);
+        w().update("nodes", v, "id=?", new String[]{String.valueOf(id)});
+    }
+
+    public void setNote(long id, String note) {
+        ContentValues v = new ContentValues();
+        v.put("note", note);
+        w().update("nodes", v, "id=?", new String[]{String.valueOf(id)});
+    }
+
+    public Node node(long id) {
+        try (Cursor c = r().query("nodes", new String[]{"id", "parent_id", "name", "note"},
+                "id=?", new String[]{String.valueOf(id)}, null, null, null)) {
+            if (c.moveToFirst()) return bindNode(c);
+        }
+        return null;
+    }
+
+    private static Node bindNode(Cursor c) {
+        Node n = new Node();
+        n.id = c.getLong(0);
+        n.parentId = c.getLong(1);
+        n.name = c.getString(2);
+        n.note = c.getString(3);
+        return n;
+    }
+
+    public List<Node> children(long parentId) {
+        List<Node> out = new ArrayList<>();
+        try (Cursor c = r().query("nodes", new String[]{"id", "parent_id", "name", "note"},
+                "parent_id=?", new String[]{String.valueOf(parentId)},
+                null, null, "created_at ASC, id ASC")) {
+            while (c.moveToNext()) out.add(bindNode(c));
+        }
+        return out;
+    }
+
+    public int countChildren(long parentId) {
+        try (Cursor c = r().rawQuery("SELECT COUNT(*) FROM nodes WHERE parent_id=?",
+                new String[]{String.valueOf(parentId)})) {
+            if (c.moveToFirst()) return c.getInt(0);
+        }
+        return 0;
+    }
+
+    /** 从顶层到该节点的链路 */
+    public List<Node> path(long id) {
+        List<Node> out = new ArrayList<>();
+        Node n = node(id);
+        int guard = 0;
+        while (n != null && guard++ < 100) {
+            out.add(0, n);
+            if (n.parentId <= 0) break;
+            n = node(n.parentId);
+        }
+        return out;
+    }
+
+    /** 级联删除节点子树及其全部图片文件 */
+    public void deleteNodeDeep(long rootId) {
+        List<Long> ids = new ArrayList<>();
+        List<Long> queue = new ArrayList<>();
+        queue.add(rootId);
+        while (!queue.isEmpty()) {
+            long id = queue.remove(queue.size() - 1);
+            ids.add(id);
+            try (Cursor c = r().query("nodes", new String[]{"id"}, "parent_id=?",
+                    new String[]{String.valueOf(id)}, null, null, null)) {
+                while (c.moveToNext()) queue.add(c.getLong(0));
+            }
+        }
+        StringBuilder in = new StringBuilder();
+        for (Long id : ids) {
+            if (in.length() > 0) in.append(',');
+            in.append(id);
+        }
+        String inS = in.toString();
+
+        List<String> files = new ArrayList<>();
+        try (Cursor c = r().rawQuery(
+                "SELECT file, thumb FROM images WHERE node_id IN (" + inS + ")", null)) {
+            while (c.moveToNext()) {
+                files.add(c.getString(0));
+                files.add(c.getString(1));
+            }
+        }
+        SQLiteDatabase d = w();
+        d.execSQL("DELETE FROM hotspots WHERE child_id IN (" + inS + ")");
+        d.execSQL("DELETE FROM hotspots WHERE image_id IN (SELECT id FROM images WHERE node_id IN (" + inS + "))");
+        d.execSQL("DELETE FROM images WHERE node_id IN (" + inS + ")");
+        d.execSQL("DELETE FROM nodes WHERE id IN (" + inS + ")");
+        for (String f : files) {
+            new File(imgDir, f).delete();
+            new File(thumbDir, f).delete();
+        }
+    }
+
+    // ---------------- 图片 ----------------
+
+    public List<Pic> images(long nodeId) {
+        List<Pic> out = new ArrayList<>();
+        try (Cursor c = r().query("images", new String[]{"id", "file", "thumb"},
+                "node_id=?", new String[]{String.valueOf(nodeId)},
+                null, null, "created_at ASC, id ASC")) {
+            while (c.moveToNext()) {
+                Pic p = new Pic();
+                p.id = c.getLong(0);
+                p.file = c.getString(1);
+                p.thumb = c.getString(2);
+                out.add(p);
+            }
+        }
+        return out;
+    }
+
+    public Pic image(long picId) {
+        try (Cursor c = r().query("images", new String[]{"id", "file", "thumb"},
+                "id=?", new String[]{String.valueOf(picId)}, null, null, null)) {
+            if (c.moveToFirst()) {
+                Pic p = new Pic();
+                p.id = c.getLong(0);
+                p.file = c.getString(1);
+                p.thumb = c.getString(2);
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public File imageFile(String name) {
+        return new File(imgDir, name);
+    }
+
+    public File thumbFile(String name) {
+        return new File(thumbDir, name);
+    }
+
+    /** 处理 pending 目录中的临时图片文件（压缩、旋转、生成缩略图）并挂到节点上 */
+    public Pic addImageFromPending(long nodeId, File pendingFile) {
+        try {
+            Bitmap bmp = decodeRotatedScaled(pendingFile, 1600);
+            if (bmp == null) {
+                pendingFile.delete();
+                return null;
+            }
+            String base = "img_" + System.nanoTime() + "_" + nodeId + ".jpg";
+            File full = new File(imgDir, base);
+            File th = new File(thumbDir, base);
+            try (OutputStream os = new FileOutputStream(full)) {
+                bmp.compress(Bitmap.CompressFormat.JPEG, 86, os);
+            }
+            Bitmap tb = scaleBitmap(bmp, 320);
+            try (OutputStream os = new FileOutputStream(th)) {
+                tb.compress(Bitmap.CompressFormat.JPEG, 80, os);
+            }
+            if (tb != bmp) tb.recycle();
+            bmp.recycle();
+            ContentValues v = new ContentValues();
+            v.put("node_id", nodeId);
+            v.put("file", base);
+            v.put("thumb", base);
+            v.put("created_at", System.currentTimeMillis());
+            long id = w().insert("images", null, v);
+            pendingFile.delete();
+            Pic p = new Pic();
+            p.id = id;
+            p.file = base;
+            p.thumb = base;
+            return p;
+        } catch (Exception e) {
+            pendingFile.delete();
+            return null;
+        }
+    }
+
+    public void moveImageFirst(long picId) {
+        try (Cursor c = r().rawQuery(
+                "SELECT MIN(created_at) FROM images WHERE node_id=(SELECT node_id FROM images WHERE id=?)",
+                new String[]{String.valueOf(picId)})) {
+            if (c.moveToFirst() && !c.isNull(0)) {
+                ContentValues v = new ContentValues();
+                v.put("created_at", c.getLong(0) - 1);
+                w().update("images", v, "id=?", new String[]{String.valueOf(picId)});
+            }
+        }
+    }
+
+    public void deleteImage(long picId) {
+        Pic p = image(picId);
+        if (p == null) return;
+        w().delete("hotspots", "image_id=?", new String[]{String.valueOf(picId)});
+        w().delete("images", "id=?", new String[]{String.valueOf(picId)});
+        new File(imgDir, p.file).delete();
+        new File(thumbDir, p.thumb).delete();
+    }
+
+    // ---------------- 交互点 ----------------
+
+    public List<Hotspot> hotspots(long imageId) {
+        List<Hotspot> out = new ArrayList<>();
+        try (Cursor c = r().rawQuery(
+                "SELECT h.id, h.child_id, h.x, h.y, n.name FROM hotspots h " +
+                        "LEFT JOIN nodes n ON n.id = h.child_id " +
+                        "WHERE h.image_id=? ORDER BY h.id ASC",
+                new String[]{String.valueOf(imageId)})) {
+            while (c.moveToNext()) {
+                Hotspot h = new Hotspot();
+                h.id = c.getLong(0);
+                h.childId = c.getLong(1);
+                h.x = (float) c.getDouble(2);
+                h.y = (float) c.getDouble(3);
+                h.childName = c.isNull(4) ? "" : c.getString(4);
+                out.add(h);
+            }
+        }
+        return out;
+    }
+
+    public void addHotspot(long imageId, float x, float y, long childId) {
+        ContentValues v = new ContentValues();
+        v.put("image_id", imageId);
+        v.put("child_id", childId);
+        v.put("x", x);
+        v.put("y", y);
+        w().insert("hotspots", null, v);
+    }
+
+    public void deleteHotspot(long hotspotId) {
+        w().delete("hotspots", "id=?", new String[]{String.valueOf(hotspotId)});
+    }
+
+    // ---------------- 图片解码 ----------------
+
+    public static Bitmap decodeScaled(File f, int maxDim) {
+        try {
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(f.getAbsolutePath(), o);
+            if (o.outWidth <= 0 || o.outHeight <= 0) return null;
+            int s = 1;
+            while (Math.max(o.outWidth, o.outHeight) / (s * 2) >= maxDim) s *= 2;
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = s;
+            Bitmap b = BitmapFactory.decodeFile(f.getAbsolutePath(), o2);
+            if (b == null) return null;
+            if (Math.max(b.getWidth(), b.getHeight()) > maxDim) {
+                float sc = maxDim / (float) Math.max(b.getWidth(), b.getHeight());
+                Bitmap b2 = Bitmap.createScaledBitmap(b,
+                        Math.max(1, Math.round(b.getWidth() * sc)),
+                        Math.max(1, Math.round(b.getHeight() * sc)), true);
+                if (b2 != b) b.recycle();
+                b = b2;
+            }
+            return b;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    public static Bitmap decodeRotatedScaled(File f, int maxDim) {
+        Bitmap b = decodeScaled(f, maxDim);
+        if (b == null) return null;
+        int deg = 0;
+        try {
+            ExifInterface e = new ExifInterface(f.getAbsolutePath());
+            int ori = e.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            if (ori == ExifInterface.ORIENTATION_ROTATE_90) deg = 90;
+            else if (ori == ExifInterface.ORIENTATION_ROTATE_180) deg = 180;
+            else if (ori == ExifInterface.ORIENTATION_ROTATE_270) deg = 270;
+        } catch (Throwable ignored) {
+        }
+        if (deg != 0) {
+            Matrix m = new Matrix();
+            m.postRotate(deg);
+            Bitmap b2 = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
+            if (b2 != b) b.recycle();
+            b = b2;
+        }
+        return b;
+    }
+
+    public static Bitmap scaleBitmap(Bitmap src, int maxDim) {
+        if (Math.max(src.getWidth(), src.getHeight()) <= maxDim) return src;
+        float sc = maxDim / (float) Math.max(src.getWidth(), src.getHeight());
+        return Bitmap.createScaledBitmap(src,
+                Math.max(1, Math.round(src.getWidth() * sc)),
+                Math.max(1, Math.round(src.getHeight() * sc)), true);
+    }
+}
