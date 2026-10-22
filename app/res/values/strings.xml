@@ -7,6 +7,12 @@
     <string name="main_empty">还没有收纳空间\n点击右下角 ＋ 创建一个</string>
     <string name="cd_open_menu">打开菜单</string>
     <string name="cd_new_space">新建收纳空间</string>
+    <string name="select_all">全选</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_delete">删除</string>
+    <string name="search_hint">搜索物品或收纳位，如：手表</string>
+    <string name="search_empty">没有找到相关内容</string>
+    <string name="cd_search">搜索</string>
 
     <!-- 层级页 -->
     <string name="cd_back">返回上一级</string>
@@ -17,6 +23,7 @@
     <string name="cancel_placing">取消放置</string>
     <string name="first_photo">拍第一张照片</string>
     <string name="hint_placing">放置模式：点击照片上的目标位置（如某个抽屉），为它命名即可创建交互点</string>
+    <string name="hint_longpress">小提示：长按底部缩略图可设封面或删除照片；长按照片上的圆点可打开、重命名或删除收纳位</string>
     <string name="node_empty_title">这个位置还没有照片</string>
     <string name="node_empty_body">先拍一张这里的外观照（柜子、抽屉、箱子…）\n然后在照片上放置交互点，逐层记录</string>
     <string name="photo_desc">第 %1$d 张照片</string>
@@ -35,4 +42,5 @@
     <string name="about_license_title">开源协议</string>
     <string name="about_license_sub">本应用以 MIT 协议开源：可自由使用、修改和分发，需保留版权声明。</string>
     <string name="btn_license">查看 MIT 协议全文</string>
+    <string name="btn_source">查看源代码</string>
 </resources>

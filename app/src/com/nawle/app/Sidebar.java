@@ -1,11 +1,15 @@
 package com.nawle.app;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -21,8 +25,6 @@ import android.widget.TextView;
  */
 public final class Sidebar {
     private Sidebar() {}
-
-    private static final String[] SEED_SPACES = {"卧室", "客厅", "阳台", "办公室"};
 
     public static void show(final Activity act) {
         final FrameLayout overlay = new FrameLayout(act);
@@ -113,16 +115,32 @@ public final class Sidebar {
             dismissPanel(p);
             Backup.showMenu(act);
         }));
-        p.addView(item(c, "设置", "外观 / 恢复预置空间 / 清空数据",
-                R.drawable.ic_settings, R.color.iconSettings, () -> {
+        p.addView(item(c, "检查更新", "最新版本下载 · 浏览器打开",
+                R.drawable.ic_open, R.color.iconUpdate, () -> {
             dismissPanel(p);
-            showSettings(act);
+            String url = About.REPO_URL + "/releases";
+            try {
+                act.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            } catch (Exception e) {
+                copyLink(act, url);
+            }
         }));
         p.addView(item(c, "关于与联系", "作者 · QQ群 · 赞助 · 开源协议",
                 R.drawable.ic_info, R.color.iconAbout, () -> {
             dismissPanel(p);
             act.startActivity(new Intent(act, AboutActivity.class));
         }));
+
+        // 外观快捷切换（深浅色直达，无需进设置）
+        View dv = new View(c);
+        dv.setBackgroundColor(c.getResources().getColor(R.color.divider));
+        LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, Ui.dp(c, 1));
+        dlp.leftMargin = Ui.dp(c, 18);
+        dlp.rightMargin = Ui.dp(c, 18);
+        dv.setLayoutParams(dlp);
+        p.addView(dv);
+        p.addView(appearanceSwitch(act));
 
         // 底部版权
         TextView foot = new TextView(c);
@@ -185,72 +203,87 @@ public final class Sidebar {
         return row;
     }
 
-    // ---------------- 设置 ----------------
+    /** 无浏览器时兜底：复制链接 */
+    private static void copyLink(Activity act, String url) {
+        ClipboardManager cm =
+                (ClipboardManager) act.getSystemService(Context.CLIPBOARD_SERVICE);
+        cm.setPrimaryClip(ClipData.newPlainText("发布页链接", url));
+        Ui.toast(act, "没有浏览器，链接已复制");
+    }
+
+    // ---------------- 外观 ----------------
 
     private static final String[] APPEARANCE = {"跟随系统", "浅色", "深色"};
+    private static final int[] APPEARANCE_ICONS =
+            {R.drawable.ic_auto, R.drawable.ic_sun, R.drawable.ic_moon};
 
-    private static void showSettings(final Activity act) {
-        new AlertDialog.Builder(act)
-                .setTitle("设置")
-                .setItems(new String[]{
-                        "外观（当前：" + APPEARANCE[Ui.themePref(act)] + "）",
-                        "恢复预置空间（补回 卧室/客厅/阳台/办公室）",
-                        "清空全部数据并恢复初始状态"}, (d, w) -> {
-                    if (w == 0) showAppearance(act);
-                    else if (w == 1) restoreSeeds(act);
-                    else wipeAll(act);
-                })
-                .setNegativeButton("取消", null)
-                .show();
-    }
+    /** 侧边栏外观分段切换：跟随系统 / 浅色 / 深色 */
+    private static View appearanceSwitch(final Activity act) {
+        Context c = act;
+        LinearLayout box = new LinearLayout(c);
+        box.setOrientation(LinearLayout.VERTICAL);
+        int hpad = Ui.dp(c, 18);
+        box.setPadding(hpad, Ui.dp(c, 10), hpad, Ui.dp(c, 14));
 
-    private static void showAppearance(final Activity act) {
-        final int cur = Ui.themePref(act);
-        new AlertDialog.Builder(act)
-                .setTitle("外观")
-                .setSingleChoiceItems(APPEARANCE, cur, (d, w) -> {
-                    d.dismiss();
-                    if (w != cur) {
-                        Ui.setThemePref(act, w);
-                        act.recreate();
-                    }
-                })
-                .setNegativeButton("取消", null)
-                .show();
-    }
+        TextView label = new TextView(c);
+        label.setText("外观");
+        label.setTextColor(c.getResources().getColor(R.color.onSurfaceVariant));
+        label.setTextSize(12);
+        label.setPadding(Ui.dp(c, 2), 0, 0, Ui.dp(c, 8));
+        box.addView(label);
 
-    private static void restoreSeeds(Activity act) {
-        Store st = Store.get(act);
-        int added = 0;
-        for (String n : SEED_SPACES) {
-            boolean exists = false;
-            for (Store.Node top : st.children(0)) {
-                if (top.name.equals(n)) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
-                st.createNode(0, n);
-                added++;
-            }
+        LinearLayout seg = new LinearLayout(c);
+        seg.setOrientation(LinearLayout.HORIZONTAL);
+        GradientDrawable track = new GradientDrawable();
+        track.setColor(c.getResources().getColor(R.color.surface));
+        track.setCornerRadius(Ui.dp(c, 14));
+        track.setStroke(Ui.dp(c, 1), c.getResources().getColor(R.color.outlineVariant));
+        seg.setBackground(track);
+        seg.setPadding(Ui.dp(c, 3), Ui.dp(c, 3), Ui.dp(c, 3), Ui.dp(c, 3));
+
+        final int cur = Ui.themePref(c);
+        for (int i = 0; i < APPEARANCE.length; i++) {
+            final int which = i;
+            boolean on = i == cur;
+
+            LinearLayout s = new LinearLayout(c);
+            s.setOrientation(LinearLayout.VERTICAL);
+            s.setGravity(Gravity.CENTER);
+            s.setPadding(0, Ui.dp(c, 7), 0, Ui.dp(c, 7));
+            GradientDrawable pill = new GradientDrawable();
+            pill.setCornerRadius(Ui.dp(c, 11));
+            pill.setColor(on ? c.getResources().getColor(R.color.primary) : Color.TRANSPARENT);
+            s.setBackground(pill);
+
+            ImageView ic = new ImageView(c);
+            ic.setImageResource(APPEARANCE_ICONS[i]);
+            ic.setImageTintList(ColorStateList.valueOf(c.getResources().getColor(
+                    on ? R.color.onPrimary : R.color.onSurfaceVariant)));
+            LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(Ui.dp(c, 15), Ui.dp(c, 15));
+            ilp.gravity = Gravity.CENTER_HORIZONTAL;
+            ilp.bottomMargin = Ui.dp(c, 4);
+            s.addView(ic, ilp);
+
+            TextView t = new TextView(c);
+            t.setText(APPEARANCE[i]);
+            t.setTextSize(11.5f);
+            t.setTypeface(on ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
+            t.setTextColor(c.getResources().getColor(
+                    on ? R.color.onPrimary : R.color.onSurfaceVariant));
+            s.addView(t);
+
+            LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            if (i > 0) slp.leftMargin = Ui.dp(c, 3);
+            seg.addView(s, slp);
+
+            s.setOnClickListener(v -> {
+                if (which == Ui.themePref(act)) return;
+                Ui.setThemePref(act, which);
+                act.recreate();
+            });
         }
-        Ui.toast(act, added == 0 ? "预置空间都在，无需恢复" : "已补回 " + added + " 个预置空间");
-    }
-
-    private static void wipeAll(final Activity act) {
-        Ui.confirm(act, "清空全部数据",
-                "将删除所有空间、层级、照片和交互点，并恢复到初始状态。此操作不可撤销！",
-                "继续", () -> Ui.confirm(act, "最后确认",
-                        "真的要清空全部数据吗？建议先「导出备份」留存一份。",
-                        "确认清空", () -> {
-                            Store st = Store.get(act);
-                            st.wipeAll();
-                            for (String n : SEED_SPACES) st.createNode(0, n);
-                            Ui.toast(act, "已恢复初始状态");
-                            Intent it = new Intent(act, MainActivity.class);
-                            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            act.startActivity(it);
-                        }));
+        box.addView(seg);
+        return box;
     }
 }

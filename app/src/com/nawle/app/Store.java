@@ -67,18 +67,6 @@ public class Store {
         }
     }
 
-    /** 清空全部数据（节点、图片、交互点及图片文件），用于设置里的"恢复初始状态" */
-    public void wipeAll() {
-        SQLiteDatabase d = w();
-        d.execSQL("DELETE FROM hotspots");
-        d.execSQL("DELETE FROM images");
-        d.execSQL("DELETE FROM nodes");
-        for (File dir : new File[]{imgDir, thumbDir, pendingDir}) {
-            File[] fs = dir.listFiles();
-            if (fs != null) for (File f : fs) f.delete();
-        }
-    }
-
     private final Db db;
     public final File imgDir;
     public final File thumbDir;
@@ -159,6 +147,18 @@ public class Store {
             if (c.moveToFirst()) return c.getInt(0);
         }
         return 0;
+    }
+
+    /** 按名称模糊搜索所有层级的节点（含空间/柜子/抽屉/物品），名称短的排前，最多 50 条 */
+    public List<Node> searchByName(String q) {
+        List<Node> out = new ArrayList<>();
+        if (q == null || q.trim().isEmpty()) return out;
+        try (Cursor c = r().query("nodes", new String[]{"id", "parent_id", "name", "note"},
+                "name LIKE ?", new String[]{"%" + q.trim() + "%"},
+                null, null, "LENGTH(name) ASC, created_at ASC, id ASC", "50")) {
+            while (c.moveToNext()) out.add(bindNode(c));
+        }
+        return out;
     }
 
     /** 从顶层到该节点的链路 */

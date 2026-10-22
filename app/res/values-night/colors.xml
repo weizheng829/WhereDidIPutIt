@@ -45,4 +45,11 @@
     <color name="iconBackup">#6FB1F7</color>
     <color name="iconSettings">#FFB74D</color>
     <color name="iconAbout">#F48FB1</color>
+    <color name="iconUpdate">#81C784</color>
+
+    <!-- 功能图标 -->
+    <color name="iconAppearance">#CE93D8</color>
+    <color name="iconDanger">#EF9A9A</color>
+    <color name="iconNeutral">#90A4AE</color>
+    <color name="sheetHandle">#4A5553</color>
 </resources>

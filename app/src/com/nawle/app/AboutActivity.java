@@ -72,6 +72,16 @@ public class AboutActivity extends Activity {
         qrDonate.setOnClickListener(v -> showLarge(R.drawable.qr_donate, "赞助支持"));
 
         findViewById(R.id.btnLicense).setOnClickListener(v -> showLicense());
+
+        findViewById(R.id.btnSource).setOnClickListener(v -> {
+            Intent it = new Intent(Intent.ACTION_VIEW, Uri.parse(About.REPO_URL));
+            try {
+                startActivity(it);
+            } catch (Exception e) {
+                copy("仓库地址", About.REPO_URL);
+                Ui.toast(this, "没有浏览器，仓库地址已复制");
+            }
+        });
     }
 
     private void copy(String label, String text) {

@@ -12,8 +12,8 @@
         android:background="@color/headerBg"
         android:paddingLeft="8dp"
         android:paddingRight="20dp"
-        android:paddingTop="28dp"
-        android:paddingBottom="18dp">
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,25 +34,51 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_gravity="center_vertical"
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/app_name"
                     android:textColor="@color/onHeader"
                     android:textSize="24sp"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/app_slogan"
-                    android:textColor="@color/onHeaderDim"
-                    android:textSize="13sp" />
             </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/cbSelectAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/select_all"
+                android:textColor="@color/onHeader"
+                android:textSize="14sp" />
         </LinearLayout>
+
+        <!-- 搜索框：按名称搜索所有层级的收纳位，结果面板显示位置并可跳转 -->
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/bg_search_header"
+            android:drawablePadding="8dp"
+            android:hint="@string/search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="9dp"
+            android:paddingBottom="9dp"
+            android:textColor="@color/onHeader"
+            android:textColorHint="@color/onHeaderDim"
+            android:textCursorDrawable="@drawable/cursor_search"
+            android:textSize="15sp"
+            android:contentDescription="@string/cd_search" />
     </LinearLayout>
 
     <GridView
@@ -104,4 +130,79 @@
             android:tint="@color/onPrimary"
             android:contentDescription="@string/cd_new_space" />
     </FrameLayout>
+
+    <!-- 批量选择时的底部操作条：取消 / 删除所选 -->
+    <LinearLayout
+        android:id="@+id/selBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_sel_bar"
+        android:elevation="6dp"
+        android:orientation="horizontal"
+        android:padding="6dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/btnSelCancel"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_row"
+            android:gravity="center"
+            android:text="@string/btn_cancel"
+            android:textColor="@color/primary"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/btnSelDelete"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_danger"
+            android:gravity="center"
+            android:text="@string/btn_delete"
+            android:textColor="@color/onPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 搜索结果面板：覆盖在网格之上，点击结果跳到对应层级 -->
+    <LinearLayout
+        android:id="@+id/searchPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_dialog"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ListView
+            android:id="@+id/searchList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@null"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:scrollbars="none" />
+
+        <TextView
+            android:id="@+id/searchEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="20dp"
+            android:text="@string/search_empty"
+            android:textColor="@color/onSurfaceVariant"
+            android:textSize="14sp"
+            android:visibility="gone" />
+    </LinearLayout>
 </RelativeLayout>

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -40,6 +41,8 @@ import java.util.Map;
 public class NodeActivity extends Activity implements InteractiveImageView.Host {
 
     public static final String EXTRA_NODE_ID = "node_id";
+    /** 携带完整层级链（顶层→目标），用于搜索等直达深层节点的入口 */
+    public static final String EXTRA_PATH_IDS = "path_ids";
     private static final int REQ_CAMERA = 1;
     private static final int REQ_GALLERY = 2;
 
@@ -65,6 +68,9 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
     private int loadToken = 0;
     private int pickSeq = 0;
     private int themeSeqApplied;
+    /** 长按操作的一次性提示（hintBar 复用）：hideTip 用于取消自动收起 */
+    private Runnable hideTip;
+    private boolean tipShowing;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -86,12 +92,21 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
         hintBar = findViewById(R.id.hintBar);
         btnHotspot = findViewById(R.id.btnHotspot);
 
-        long id = getIntent().getLongExtra(EXTRA_NODE_ID, -1);
-        if (id <= 0 || store.node(id) == null) {
-            finish();
-            return;
+        // 搜索等入口带完整层级链直达深层节点；链上的失效节点（如已删除）自动跳过
+        long[] chain = getIntent().getLongArrayExtra(EXTRA_PATH_IDS);
+        if (chain != null) {
+            for (long cid : chain) {
+                if (cid > 0 && store.node(cid) != null) path.add(cid);
+            }
         }
-        path.add(id);
+        if (path.isEmpty()) {
+            long id = getIntent().getLongExtra(EXTRA_NODE_ID, -1);
+            if (id <= 0 || store.node(id) == null) {
+                finish();
+                return;
+            }
+            path.add(id);
+        }
 
         findViewById(R.id.btnBack).setOnClickListener(v -> goBack());
         findViewById(R.id.btnMenu).setOnClickListener(v -> showMenu());
@@ -166,6 +181,7 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
         rebuildCrumb();
         rebuildStrip();
         updateEmptyState();
+        maybeShowLongPressTip();
     }
 
     private void showPic(int idx) {
@@ -267,6 +283,7 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
             if (b != null) im.setImageBitmap(b);
             v.setOnClickListener(vv -> showPic(idx));
             v.setOnLongClickListener(vv -> {
+                vv.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                 showPicMenu(idx);
                 return true;
             });
@@ -313,25 +330,22 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
 
     private void showPicMenu(int idx) {
         Store.Pic p = pics.get(idx);
-        new AlertDialog.Builder(this)
-                .setTitle("照片操作")
-                .setItems(new String[]{"设为封面（移到最前）", "删除这张照片"}, (d, w) -> {
-                    if (w == 0) {
-                        store.moveImageFirst(p.id);
-                        pics = store.images(node.id);
-                        rebuildStrip();
-                        showPic(0);
-                        Ui.toast(this, "已设为封面");
-                    } else {
+        Ui.sheet(this, "照片操作", "第 " + (idx + 1) + " 张 / 共 " + pics.size() + " 张")
+                .item("设为封面", "移到最前，作为这个层级的封面", R.drawable.ic_star,
+                        R.color.iconSettings, () -> {
+                            store.moveImageFirst(p.id);
+                            pics = store.images(node.id);
+                            rebuildStrip();
+                            showPic(0);
+                            Ui.toast(this, "已设为封面");
+                        })
+                .danger("删除这张照片", "照片上的交互点会一并删除", () ->
                         Ui.confirm(this, "删除照片", "删除后不可恢复，照片上的交互点也会一并删除。",
                                 "删除", () -> {
                                     store.deleteImage(p.id);
                                     lastPicByNode.remove(node.id);
                                     loadCurrent();
-                                });
-                    }
-                })
-                .setNegativeButton("取消", null)
+                                }))
                 .show();
     }
 
@@ -340,16 +354,39 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
         iv.setVisibility(pics.isEmpty() ? View.INVISIBLE : View.VISIBLE);
     }
 
+    /** 首次见到照片时提示长按操作（每台设备仅一次），点击或超时后收起 */
+    private void maybeShowLongPressTip() {
+        if (pics.isEmpty() || tipShowing) return;
+        SharedPreferences sp = getSharedPreferences("app", MODE_PRIVATE);
+        if (sp.getBoolean("tip_longpress_node", false)) return;
+        sp.edit().putBoolean("tip_longpress_node", true).apply();
+        tipShowing = true;
+        hideTip = this::hideLongPressTip;
+        hintBar.setText(R.string.hint_longpress);
+        hintBar.setVisibility(View.VISIBLE);
+        hintBar.setOnClickListener(v -> hideLongPressTip());
+        hintBar.postDelayed(hideTip, 6000);
+    }
+
+    private void hideLongPressTip() {
+        if (hideTip != null) {
+            hintBar.removeCallbacks(hideTip);
+            hideTip = null;
+        }
+        if (!tipShowing) return;
+        tipShowing = false;
+        // 放置模式的提示条不受影响
+        if (!placing) hintBar.setVisibility(View.GONE);
+    }
+
     // ---------------- 添加照片 ----------------
 
     private void chooseAddPhoto() {
-        new AlertDialog.Builder(this)
-                .setTitle("添加照片")
-                .setItems(new String[]{"拍照", "从相册选择（可多选）"}, (d, w) -> {
-                    if (w == 0) launchCamera();
-                    else launchGallery();
-                })
-                .setNegativeButton("取消", null)
+        Ui.sheet(this, "添加照片", null)
+                .item("拍照", "使用相机拍摄新照片", R.drawable.ic_camera_white,
+                        R.color.primary, () -> launchCamera())
+                .item("从相册选择", "可一次选择多张", R.drawable.ic_gallery,
+                        R.color.iconBackup, () -> launchGallery())
                 .show();
     }
 
@@ -452,6 +489,7 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
                     rebuildStrip();
                     updateEmptyState();
                     showPic(idx);
+                    maybeShowLongPressTip();
                     Ui.toast(this, "已保存 " + okCount + " 张照片");
                 } else {
                     Ui.toast(this, "保存失败，请重试");
@@ -464,7 +502,9 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
 
     private void togglePlacing() {
         placing = !placing;
+        if (placing) hideLongPressTip();
         iv.setPlacementMode(placing);
+        hintBar.setText(R.string.hint_placing);
         hintBar.setVisibility(placing ? View.VISIBLE : View.GONE);
         btnHotspot.setText(placing ? R.string.cancel_placing : R.string.add_hotspot);
         btnHotspot.setBackgroundResource(placing ? R.drawable.bg_btn_accent_on : R.drawable.bg_tonal);
@@ -487,7 +527,7 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
             long childId = store.createNode(node.id, name);
             store.addHotspot(imageId, x, y, childId);
             refreshHotspots();
-            Ui.toast(this, "已创建「" + name + "」，点击圆点即可进入");
+            Ui.toast(this, "已创建「" + name + "」，点按圆点进入，长按圆点可改名或删除");
         });
     }
 
@@ -501,58 +541,47 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
         iv.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         Store.Node child = store.node(h.childId);
         final String nm = child == null ? "子项" : child.name;
-        new AlertDialog.Builder(this)
-                .setTitle(nm)
-                .setItems(new String[]{"打开", "重命名", "移除标记（保留子项）", "删除子项及全部内容"}, (d, w) -> {
-                    if (w == 0) {
-                        enterChild(h.childId);
-                    } else if (w == 1) {
+        Ui.sheet(this, nm, "收纳位 · 交互点")
+                .item("打开", R.drawable.ic_open, R.color.primary, () -> enterChild(h.childId))
+                .item("重命名", R.drawable.ic_edit, R.color.primary, () ->
                         Ui.promptText(this, "重命名", "", nm, false, s -> {
                             store.renameNode(h.childId, s);
                             refreshHotspots();
-                        });
-                    } else if (w == 2) {
-                        store.deleteHotspot(h.id);
-                        refreshHotspots();
-                    } else {
+                        }))
+                .item("移除标记", "仅移除照片上的圆点，保留子项内容",
+                        R.drawable.ic_close_white, R.color.iconNeutral, () -> {
+                            store.deleteHotspot(h.id);
+                            refreshHotspots();
+                        })
+                .danger("删除子项及全部内容", "将删除「" + nm + "」及其全部子层级和照片", () ->
                         Ui.confirm(this, "删除子项",
                                 "将删除「" + nm + "」及其全部子层级和照片，不可恢复。",
                                 "删除", () -> {
                                     store.deleteNodeDeep(h.childId);
                                     refreshHotspots();
-                                });
-                    }
-                })
-                .setNegativeButton("取消", null)
+                                }))
                 .show();
     }
 
     // ---------------- 右上菜单 ----------------
 
     private void showMenu() {
-        new AlertDialog.Builder(this)
-                .setTitle(node.name)
-                .setItems(new String[]{"重命名", "编辑备注", "查看子项列表", "删除本层级",
-                        "备份与恢复…", "关于与联系…"}, (d, w) -> {
-                    if (w == 0) {
+        Ui.sheet(this, node.name, "当前层级 · 长按缩略图或圆点可管理")
+                .item("重命名", R.drawable.ic_edit, R.color.primary, () ->
                         Ui.promptText(this, "重命名", "", node.name, false, s -> {
                             store.renameNode(node.id, s);
                             loadCurrent();
-                        });
-                    } else if (w == 1) {
-                        Ui.promptText(this, "备注", "记录这里的存放说明", node.note == null ? "" : node.note,
-                                true, s -> {
+                        }))
+                .item("编辑备注", "记录这里的存放说明", R.drawable.ic_note,
+                        R.color.iconAppearance, () ->
+                        Ui.promptText(this, "备注", "记录这里的存放说明",
+                                node.note == null ? "" : node.note, true, s -> {
                                     store.setNote(node.id, s);
                                     node = store.node(node.id);
                                     Ui.toast(this, "备注已保存");
-                                });
-                    } else if (w == 2) {
-                        showChildList();
-                    } else if (w == 4) {
-                        Backup.showMenu(this);
-                    } else if (w == 5) {
-                        startActivity(new Intent(this, AboutActivity.class));
-                    } else {
+                                }))
+                .item("查看子项列表", R.drawable.ic_list, R.color.iconBackup, () -> showChildList())
+                .danger("删除本层级", "将删除全部子层级和照片，不可恢复", () ->
                         Ui.confirm(this, "删除本层级",
                                 "将删除「" + node.name + "」及其全部子层级和照片，不可恢复。",
                                 "删除", () -> {
@@ -563,10 +592,7 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
                                     } else {
                                         finish();
                                     }
-                                });
-                    }
-                })
-                .setNegativeButton("取消", null)
+                                }))
                 .show();
     }
 
@@ -576,16 +602,16 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
             Ui.toast(this, "还没有子项：先添加照片，再放置交互点");
             return;
         }
-        String[] items = new String[kids.size()];
-        for (int i = 0; i < kids.size(); i++) {
-            Store.Node k = kids.get(i);
-            items[i] = k.name + "（" + store.countChildren(k.id) + " 子项 · "
-                    + store.images(k.id).size() + " 图）";
+        Ui.Sheet sheet = Ui.sheet(this, "子项列表", "共 " + kids.size() + " 个收纳位");
+        for (Store.Node k : kids) {
+            int subKids = store.countChildren(k.id);
+            int subPics = store.images(k.id).size();
+            String sub = (subKids > 0 ? subKids + " 个子层级" : "")
+                    + (subKids > 0 && subPics > 0 ? " · " : "")
+                    + (subPics > 0 ? subPics + " 张照片" : "");
+            if (sub.isEmpty()) sub = "还没有内容";
+            sheet.child(k.name, sub, Ui.tileColor(k.id), () -> enterChild(k.id));
         }
-        new AlertDialog.Builder(this)
-                .setTitle("子项列表")
-                .setItems(items, (d, i) -> enterChild(kids.get(i).id))
-                .setNegativeButton("关闭", null)
-                .show();
+        sheet.show();
     }
 }

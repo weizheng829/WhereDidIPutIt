@@ -6,7 +6,7 @@ BT="$ROOT/toolchain/bt/android-14"
 AJAR="$ROOT/toolchain/pf/android-34/android.jar"
 OUT="$ROOT/build"
 APKDIR="$ROOT/apk"
-APKNAME="收哪了-v1.1.apk"
+APKNAME="收哪了-v1.2.apk"
 
 rm -rf "$OUT"
 mkdir -p "$OUT/gen" "$OUT/classes" "$OUT/dex" "$APKDIR"

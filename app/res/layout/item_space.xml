@@ -60,4 +60,26 @@
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
+
+    <!-- 批量选择的选中态：主色半透明蒙层 + 右上角对勾角标 -->
+    <View
+        android:id="@+id/selDim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/selScrim"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/selBadge"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_gravity="end|top"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/bg_check_badge"
+        android:contentDescription="@null"
+        android:padding="6dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_check"
+        android:visibility="gone" />
 </FrameLayout>

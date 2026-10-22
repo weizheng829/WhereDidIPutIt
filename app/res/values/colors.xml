@@ -40,9 +40,18 @@
     <color name="controlHighlight">#1E00897B</color>
     <color name="arrowDim">#C6CDCB</color>
     <color name="crumbPillStroke">#00000000</color>
+    <color name="danger">#E53935</color>
+    <color name="selScrim">#6600897B</color>
 
     <!-- 侧边栏菜单图标 -->
     <color name="iconBackup">#1E88E5</color>
     <color name="iconSettings">#F57C00</color>
     <color name="iconAbout">#E91E63</color>
+    <color name="iconUpdate">#43A047</color>
+
+    <!-- 功能图标 -->
+    <color name="iconAppearance">#8E24AA</color>
+    <color name="iconDanger">#E53935</color>
+    <color name="iconNeutral">#607D8B</color>
+    <color name="sheetHandle">#C6CDCB</color>
 </resources>
