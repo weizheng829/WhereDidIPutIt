@@ -5,10 +5,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BT="$ROOT/toolchain/bt/android-14"
 AJAR="$ROOT/toolchain/pf/android-34/android.jar"
 OUT="$ROOT/build"
+APKDIR="$ROOT/apk"
 APKNAME="收哪了-v1.1.apk"
 
 rm -rf "$OUT"
-mkdir -p "$OUT/gen" "$OUT/classes" "$OUT/dex"
+mkdir -p "$OUT/gen" "$OUT/classes" "$OUT/dex" "$APKDIR"
 
 echo "[1/6] 编译资源 (aapt2 compile)"
 "$BT/aapt2.exe" compile --dir "$ROOT/app/res" -o "$OUT/res.zip"
@@ -40,6 +41,6 @@ if [ ! -f "$KS" ]; then
     -dname "CN=Nawle" -keyalg RSA -keysize 2048 -validity 10000
 fi
 "$BT/apksigner.bat" sign --ks "$KS" --ks-pass pass:android --key-pass pass:android \
-  --out "$ROOT/$APKNAME" "$OUT/app.aligned.apk"
-"$BT/apksigner.bat" verify "$ROOT/$APKNAME"
-echo "构建完成: $ROOT/$APKNAME"
+  --out "$APKDIR/$APKNAME" "$OUT/app.aligned.apk"
+"$BT/apksigner.bat" verify "$APKDIR/$APKNAME"
+echo "构建完成: $APKDIR/$APKNAME"

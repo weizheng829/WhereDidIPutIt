@@ -3,7 +3,7 @@
 通过「拍照 + 照片上的交互点」逐层记录家里柜子、抽屉、箱子的物品存放位置，
 解决"东西收哪了"的遗忘问题。
 
-**成品 APK**：`收哪了-v1.1.apk`（已签名，无需任何权限）
+**成品 APK**：`apk/收哪了-v1.1.apk`（已签名，无需任何权限）
 **开源协议**：MIT（见 `LICENSE`）— 可自由使用、修改和分发，需保留版权声明
 
 ## 功能
@@ -53,9 +53,9 @@
 
 ## 安装
 
-- **直接安装**：把 `收哪了-v1.1.apk` 传到手机（微信/网盘/数据线均可），文件管理器
+- **直接安装**：把 `apk/收哪了-v1.1.apk` 传到手机（微信/网盘/数据线均可），文件管理器
   点击打开，允许"安装未知来源应用"即可。要求 Android 5.0+。
-- **adb 安装**：`adb install -r 收哪了-v1.1.apk`（手机需已授权 USB 调试）。
+- **adb 安装**：`adb install -r apk/收哪了-v1.1.apk`（手机需已授权 USB 调试）。
 
 ## 重新构建
 
@@ -89,6 +89,9 @@ app/
   assets/license.txt           MIT 协议全文（关于页展示用）
 scripts/GenIcons.java          启动图标生成器
 scripts/GenQrPlaceholders.java QQ群/收款码占位图生成器
+apk/                           成品 APK（构建脚本输出目录）
+screenshots/                   应用截图
+testimg/                       开发测试用示例照片
 LICENSE                        MIT 协议
 build.sh                       一键构建脚本
 toolchain/                     构建工具链（aapt2/d8/zipalign/apksigner/android.jar）
