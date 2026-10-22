@@ -117,54 +117,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/label_author"
-                            android:textColor="@color/onSurfaceVariant"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tvAuthor"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/onSurface"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/btnCopyAuthor"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_chip"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp"
-                        android:text="@string/btn_copy"
-                        android:textColor="@color/chipText"
-                        android:textSize="13sp" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="12dp"
-                    android:background="@color/divider" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:text="@string/label_email"
                             android:textColor="@color/onSurfaceVariant"
                             android:textSize="12sp" />

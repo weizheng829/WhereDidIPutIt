@@ -47,11 +47,9 @@ public class AboutActivity extends Activity {
 
         ((TextView) findViewById(R.id.tvVersion)).setText(
                 "v" + About.versionName(this) + " · " + About.LICENSE_NAME + " 开源");
-        ((TextView) findViewById(R.id.tvAuthor)).setText(About.AUTHOR);
         ((TextView) findViewById(R.id.tvEmail)).setText(About.EMAIL);
         ((TextView) findViewById(R.id.tvCopyright)).setText(About.COPYRIGHT);
 
-        findViewById(R.id.btnCopyAuthor).setOnClickListener(v -> copy("作者", About.AUTHOR));
         findViewById(R.id.btnCopyEmail).setOnClickListener(v -> copy("邮箱", About.EMAIL));
 
         findViewById(R.id.btnMail).setOnClickListener(v -> {

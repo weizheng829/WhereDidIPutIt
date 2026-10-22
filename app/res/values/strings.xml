@@ -24,8 +24,7 @@
     <!-- 关于页 -->
     <string name="about_title">关于与联系</string>
     <string name="about_tagline">拍照 + 照片上的交互点，逐层记录家里东西收哪了。\n完全离线 · 不联网 · 不申请任何权限 · 开源免费</string>
-    <string name="about_contact">作者与联系</string>
-    <string name="label_author">作者</string>
+    <string name="about_contact">联系作者</string>
     <string name="label_email">邮箱（问题反馈 / 建议）</string>
     <string name="btn_copy">复制</string>
     <string name="btn_mail">发邮件</string>
