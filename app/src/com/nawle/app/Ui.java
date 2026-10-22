@@ -8,7 +8,9 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -97,7 +99,8 @@ public final class Ui {
                 ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 : InputType.TYPE_CLASS_TEXT);
         et.setBackgroundResource(R.drawable.bg_input);
-        et.setPadding(dp(c, 14), dp(c, 12), dp(c, 14), dp(c, 12));
+        // 单行时右侧预留 × 清空按钮的位置（多行备注不放 ×，避免悬在文字中间）
+        et.setPadding(dp(c, 14), dp(c, 12), dp(c, multiline ? 14 : 40), dp(c, 12));
         if (multiline) {
             et.setMinLines(4);
             et.setGravity(Gravity.TOP);
@@ -112,6 +115,37 @@ public final class Ui {
         lp.bottomMargin = dp(c, 8);
         et.setLayoutParams(lp);
         wrap.addView(et);
+
+        // 有内容时右侧显示 ×，点击一键清空；空内容隐藏避免干扰
+        if (!multiline) {
+            final ImageView clear = new ImageView(c);
+            clear.setImageResource(R.drawable.ic_clear);
+            clear.setImageTintList(ColorStateList.valueOf(
+                    c.getResources().getColor(R.color.onSurfaceVariant)));
+            clear.setPadding(dp(c, 12), dp(c, 12), dp(c, 12), dp(c, 12));
+            clear.setOnClickListener(v -> et.setText(""));
+            clear.setVisibility(initial != null && initial.length() > 0
+                    ? View.VISIBLE : View.GONE);
+            // 与输入框同边距：× 锚定在框内右缘，而不是弹窗边缘
+            FrameLayout.LayoutParams clp = new FrameLayout.LayoutParams(
+                    dp(c, 40), dp(c, 40), Gravity.END | Gravity.CENTER_VERTICAL);
+            clp.rightMargin = pad;
+            wrap.addView(clear, clp);
+            et.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int a, int b, int cc) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int a, int b, int cc) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    clear.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
+                }
+            });
+        }
         // 空内容时保持弹窗打开（默认按钮监听会在点击后无条件关闭）
         final AlertDialog dlg = new AlertDialog.Builder(c)
                 .setTitle(title)

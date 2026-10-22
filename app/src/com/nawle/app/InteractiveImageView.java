@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -42,6 +43,8 @@ public class InteractiveImageView extends View {
     private final Paint pStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pLabel = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pEmpty = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF rectTmp = new RectF();
+    private final RectF haloTmp = new RectF();
 
     private ScaleGestureDetector scaleDetector;
     private GestureDetector gestureDetector;
@@ -237,6 +240,7 @@ public class InteractiveImageView extends View {
     private Store.Hotspot hitHotspot(float sx, float sy) {
         if (bitmap == null) return null;
         float r = hotspotRadius() + Ui.dp(getContext(), 10);
+        float touch = Ui.dp(getContext(), 10);
         for (int i = hotspots.size() - 1; i >= 0; i--) {
             Store.Hotspot h = hotspots.get(i);
             float[] pts = {h.x * bitmap.getWidth(), h.y * bitmap.getHeight()};
@@ -244,6 +248,12 @@ public class InteractiveImageView extends View {
             float dx = pts[0] - sx;
             float dy = pts[1] - sy;
             if (dx * dx + dy * dy <= r * r) return h;
+            String label = labelFor(h);
+            if (!label.isEmpty()) {
+                pillRectInto(pts[0], pts[1], label, rectTmp);
+                rectTmp.inset(-touch, -touch);
+                if (rectTmp.contains(sx, sy)) return h;
+            }
         }
         return null;
     }
@@ -257,21 +267,47 @@ public class InteractiveImageView extends View {
             return;
         }
         c.drawBitmap(bitmap, matrix, null);
-        float r = hotspotRadius();
         for (Store.Hotspot h : hotspots) {
             float[] pts = {h.x * bitmap.getWidth(), h.y * bitmap.getHeight()};
             matrix.mapPoints(pts);
-            c.drawCircle(pts[0], pts[1], r + Ui.dp(getContext(), 3.5f), pHalo);
-            c.drawCircle(pts[0], pts[1], r, pFill);
-            c.drawCircle(pts[0], pts[1], r, pStroke);
-            float ty = pts[1] - (pLabel.ascent() + pLabel.descent()) / 2f;
-            c.drawText(labelFor(h), pts[0], ty, pLabel);
+            String label = labelFor(h);
+            if (label.isEmpty()) {
+                float r = hotspotRadius();
+                c.drawCircle(pts[0], pts[1], r + Ui.dp(getContext(), 3.5f), pHalo);
+                c.drawCircle(pts[0], pts[1], r, pFill);
+                c.drawCircle(pts[0], pts[1], r, pStroke);
+                float ty = pts[1] - (pLabel.ascent() + pLabel.descent()) / 2f;
+                c.drawText("•", pts[0], ty, pLabel);
+            } else {
+                drawLabelPill(c, pts[0], pts[1], label);
+            }
         }
     }
 
+    /** 有名字的交互点画成胶囊标签，完整展示名字而不是只取首字 */
+    private void drawLabelPill(Canvas c, float cx, float cy, String label) {
+        pillRectInto(cx, cy, label, rectTmp);
+        haloTmp.set(rectTmp);
+        float grow = Ui.dp(getContext(), 3.5f);
+        haloTmp.inset(-grow, -grow);
+        float corner = rectTmp.height() / 2f;
+        c.drawRoundRect(haloTmp, corner, corner, pHalo);
+        c.drawRoundRect(rectTmp, corner, corner, pFill);
+        c.drawRoundRect(rectTmp, corner, corner, pStroke);
+        float ty = cy - (pLabel.ascent() + pLabel.descent()) / 2f;
+        c.drawText(label, cx, ty, pLabel);
+    }
+
+    private void pillRectInto(float cx, float cy, String label, RectF out) {
+        float w = pLabel.measureText(label) + Ui.dp(getContext(), 10) * 2;
+        float hgt = (pLabel.descent() - pLabel.ascent()) + Ui.dp(getContext(), 7) * 2;
+        out.set(cx - w / 2f, cy - hgt / 2f, cx + w / 2f, cy + hgt / 2f);
+    }
+
+    /** 名字过长时截断加省略号，避免标签超出屏幕；空串表示未命名 */
     private String labelFor(Store.Hotspot h) {
         String n = h.childName == null ? "" : h.childName.trim();
-        if (n.isEmpty()) return "•";
-        return n.substring(0, 1);
+        if (n.length() <= 12) return n;
+        return n.substring(0, 12) + "…";
     }
 }
