@@ -3,7 +3,7 @@
 通过「拍照 + 照片上的交互点」逐层记录家里柜子、抽屉、箱子的物品存放位置，
 解决"东西收哪了"的遗忘问题。
 
-**成品 APK**：`apk/收哪了-v1.1.apk`（已签名，无需任何权限）
+**成品 APK**：[Releases 下载](https://github.com/weizheng829/WhereDidIPutIt/releases/latest)（或仓库内 `apk/收哪了-v1.1.apk`，已签名，无需任何权限）
 **开源协议**：MIT（见 `LICENSE`）— 可自由使用、修改和分发，需保留版权声明
 
 ## 界面预览
