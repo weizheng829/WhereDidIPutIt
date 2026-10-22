@@ -8,9 +8,8 @@ public final class About {
 
     public static final String AUTHOR = "weizheng";
     public static final String EMAIL = "weizheng111@gmail.com";
-    public static final String LICENSE_NAME = "MIT";
     public static final String REPO_URL = "https://github.com/weizheng829/WhereDidIPutIt";
-    public static final String COPYRIGHT = "Copyright © 2026 " + AUTHOR + " · " + LICENSE_NAME + " License";
+    public static final String COPYRIGHT = "Copyright © 2026 " + AUTHOR;
 
     public static String versionName(android.content.Context ctx) {
         try {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 头部搜索框的白色竖线光标：默认主题色光标在青色头部上看不清 -->
+<!-- 搜索框的竖线光标：主题青色，浅色框底上清晰可见 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <size android:width="2dp" />
-    <solid android:color="@color/onHeader" />
+    <solid android:color="@color/primary" />
 </shape>

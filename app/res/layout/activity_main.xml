@@ -47,14 +47,39 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <CheckBox
-                android:id="@+id/cbSelectAll"
+            <!-- 常态显示「选择」，进入选择态后由代码切换为「全选/取消全选」 -->
+            <TextView
+                android:id="@+id/btnSelect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="@string/select_all"
+                android:background="@drawable/bg_header_pill"
+                android:gravity="center"
+                android:minWidth="56dp"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="@string/select"
                 android:textColor="@color/onHeader"
                 android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/btnSelectAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/bg_header_pill"
+                android:gravity="center"
+                android:minWidth="56dp"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="@string/select_all"
+                android:textColor="@color/onHeader"
+                android:textSize="14sp"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- 搜索框：按名称搜索所有层级的收纳位，结果面板显示位置并可跳转 -->
@@ -74,8 +99,8 @@
             android:paddingRight="12dp"
             android:paddingTop="9dp"
             android:paddingBottom="9dp"
-            android:textColor="@color/onHeader"
-            android:textColorHint="@color/onHeaderDim"
+            android:textColor="@color/onSurface"
+            android:textColorHint="@color/onSurfaceVariant"
             android:textCursorDrawable="@drawable/cursor_search"
             android:textSize="15sp"
             android:contentDescription="@string/cd_search" />

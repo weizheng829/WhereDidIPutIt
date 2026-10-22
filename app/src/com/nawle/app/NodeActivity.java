@@ -581,6 +581,8 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
                                     Ui.toast(this, "备注已保存");
                                 }))
                 .item("查看子项列表", R.drawable.ic_list, R.color.iconBackup, () -> showChildList())
+                .item("侧边栏（备份 / 外观 / 关于）", R.drawable.ic_menu,
+                        R.color.iconAbout, () -> Sidebar.show(this))
                 .danger("删除本层级", "将删除全部子层级和照片，不可恢复", () ->
                         Ui.confirm(this, "删除本层级",
                                 "将删除「" + node.name + "」及其全部子层级和照片，不可恢复。",

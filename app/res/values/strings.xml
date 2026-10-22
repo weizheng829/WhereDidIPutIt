@@ -7,7 +7,9 @@
     <string name="main_empty">还没有收纳空间\n点击右下角 ＋ 创建一个</string>
     <string name="cd_open_menu">打开菜单</string>
     <string name="cd_new_space">新建收纳空间</string>
+    <string name="select">选择</string>
     <string name="select_all">全选</string>
+    <string name="deselect_all">取消全选</string>
     <string name="btn_cancel">取消</string>
     <string name="btn_delete">删除</string>
     <string name="search_hint">搜索物品或收纳位，如：手表</string>
@@ -30,17 +32,16 @@
 
     <!-- 关于页 -->
     <string name="about_title">关于与联系</string>
-    <string name="about_tagline">拍照 + 照片上的交互点，逐层记录家里东西收哪了。\n完全离线 · 不联网 · 不申请任何权限 · 开源免费</string>
+    <string name="about_tagline">拍照 + 照片上的交互点，逐层记录家里东西收哪了。\n不联网 · 不申请任何权限 · 开源 · 永久免费</string>
     <string name="about_contact">联系作者</string>
     <string name="label_email">邮箱（问题反馈 / 建议）</string>
     <string name="btn_copy">复制</string>
-    <string name="btn_mail">发邮件</string>
     <string name="about_qq_title">QQ 交流群</string>
     <string name="about_qq_sub">扫码进群，交流用法、反馈问题、催更功能</string>
     <string name="about_donate_title">赞助支持</string>
     <string name="about_donate_sub">如果这个小工具帮到了你，可以请作者喝杯咖啡 ☕\n（微信 / 支付宝扫一扫）</string>
-    <string name="about_license_title">开源协议</string>
-    <string name="about_license_sub">本应用以 MIT 协议开源：可自由使用、修改和分发，需保留版权声明。</string>
-    <string name="btn_license">查看 MIT 协议全文</string>
+    <string name="about_license_title">开源与源码</string>
+    <string name="about_license_sub">本应用以 MIT 协议开源，永久免费，可自由使用、修改和分发，仅需保留版权声明。</string>
+    <string name="btn_license">查看开源协议</string>
     <string name="btn_source">查看源代码</string>
 </resources>

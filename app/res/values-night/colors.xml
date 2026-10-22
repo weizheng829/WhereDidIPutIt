@@ -52,4 +52,11 @@
     <color name="iconDanger">#EF9A9A</color>
     <color name="iconNeutral">#90A4AE</color>
     <color name="sheetHandle">#4A5553</color>
+
+    <!-- 首页搜索框（头部上的输入区）：夜间用亮一档的底 + 描边，与深青头部区分 -->
+    <color name="searchBarBg">#24332E</color>
+    <color name="searchBarStroke">#44514D</color>
+
+    <!-- 头部胶囊按钮（管理 / 全选） -->
+    <color name="headerPillBg">#33FFFFFF</color>
 </resources>

@@ -46,23 +46,11 @@ public class AboutActivity extends Activity {
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         ((TextView) findViewById(R.id.tvVersion)).setText(
-                "v" + About.versionName(this) + " · " + About.LICENSE_NAME + " 开源");
+                "v" + About.versionName(this));
         ((TextView) findViewById(R.id.tvEmail)).setText(About.EMAIL);
         ((TextView) findViewById(R.id.tvCopyright)).setText(About.COPYRIGHT);
 
         findViewById(R.id.btnCopyEmail).setOnClickListener(v -> copy("邮箱", About.EMAIL));
-
-        findViewById(R.id.btnMail).setOnClickListener(v -> {
-            Intent it = new Intent(Intent.ACTION_SENDTO,
-                    Uri.fromParts("mailto", About.EMAIL, null));
-            it.putExtra(Intent.EXTRA_SUBJECT, "「收哪了」反馈");
-            try {
-                startActivity(it);
-            } catch (Exception e) {
-                copy("邮箱", About.EMAIL);
-                Ui.toast(this, "没有邮件应用，邮箱已复制");
-            }
-        });
 
         ImageView qrQQ = findViewById(R.id.qrQQ);
         ImageView qrDonate = findViewById(R.id.qrDonate);

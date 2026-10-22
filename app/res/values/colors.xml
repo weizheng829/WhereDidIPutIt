@@ -54,4 +54,11 @@
     <color name="iconDanger">#E53935</color>
     <color name="iconNeutral">#607D8B</color>
     <color name="sheetHandle">#C6CDCB</color>
+
+    <!-- 首页搜索框（头部上的输入区） -->
+    <color name="searchBarBg">#FFFFFF</color>
+    <color name="searchBarStroke">#D3DEDB</color>
+
+    <!-- 头部胶囊按钮（管理 / 全选） -->
+    <color name="headerPillBg">#33FFFFFF</color>
 </resources>

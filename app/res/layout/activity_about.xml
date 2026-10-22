@@ -141,20 +141,6 @@
                         android:text="@string/btn_copy"
                         android:textColor="@color/chipText"
                         android:textSize="13sp" />
-
-                    <TextView
-                        android:id="@+id/btnMail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:background="@drawable/bg_chip"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp"
-                        android:text="@string/btn_mail"
-                        android:textColor="@color/chipText"
-                        android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -229,7 +215,7 @@
                     android:contentDescription="@string/about_donate_title" />
             </LinearLayout>
 
-            <!-- 开源协议 -->
+            <!-- 开源与源码 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

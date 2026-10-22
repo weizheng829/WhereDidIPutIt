@@ -81,6 +81,9 @@ public class Store {
         imgDir.mkdirs();
         thumbDir.mkdirs();
         pendingDir.mkdirs();
+        // 清掉上次进程异常中断遗留的拍照/选图临时文件
+        File[] leftovers = pendingDir.listFiles();
+        if (leftovers != null) for (File f : leftovers) f.delete();
     }
 
     private SQLiteDatabase r() {

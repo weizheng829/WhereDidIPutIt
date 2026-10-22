@@ -112,19 +112,24 @@ public final class Ui {
         lp.bottomMargin = dp(c, 8);
         et.setLayoutParams(lp);
         wrap.addView(et);
-        new AlertDialog.Builder(c)
+        // 空内容时保持弹窗打开（默认按钮监听会在点击后无条件关闭）
+        final AlertDialog dlg = new AlertDialog.Builder(c)
                 .setTitle(title)
                 .setView(wrap)
-                .setPositiveButton("确定", (d, w) -> {
+                .setPositiveButton("确定", null)
+                .setNegativeButton("取消", null)
+                .create();
+        dlg.setOnShowListener(d -> ((AlertDialog) d).getButton(AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(v -> {
                     String s = et.getText().toString().trim();
                     if (s.isEmpty()) {
                         toast(c, "内容不能为空");
                         return;
                     }
+                    dlg.dismiss();
                     cb.onOk(s);
-                })
-                .setNegativeButton("取消", null)
-                .show();
+                }));
+        dlg.show();
     }
 
     public static void confirm(Context c, String title, String msg, String okLabel, Runnable onOk) {
@@ -168,6 +173,13 @@ public final class Ui {
 
     public static int tileColor(long id) {
         return TILE_COLORS[(int) Math.abs(id % TILE_COLORS.length)];
+    }
+
+    /** 首字母色块用：空名兜底为「·」，避免 substring 越界 */
+    public static String firstChar(String s) {
+        if (s == null) return "·";
+        s = s.trim();
+        return s.isEmpty() ? "·" : s.substring(0, 1);
     }
 
     // ---------------- 底部操作面板 ----------------
@@ -409,7 +421,7 @@ public final class Ui {
                 row.addView(ic, ilp);
             } else {
                 TextView letter = new TextView(c);
-                letter.setText(r.label.substring(0, 1));
+                letter.setText(firstChar(r.label));
                 letter.setTextSize(19);
                 letter.setTypeface(Typeface.DEFAULT_BOLD);
                 letter.setTextColor(c.getResources().getColor(R.color.tileLetter));

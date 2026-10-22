@@ -12,12 +12,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -37,20 +37,22 @@ public class MainActivity extends Activity {
     private GridView grid;
     private SpaceAdapter adapter;
     private final List<Store.Node> spaces = new ArrayList<>();
-    private final Map<Long, Bitmap> thumbCache = new HashMap<>();
+    /** 按缩略图文件名缓存：层级页换封面后回首页能立即刷新 */
+    private final Map<String, Bitmap> thumbCache = new HashMap<>();
     private Store store;
     private int themeSeqApplied;
 
-    /** 批量选择删除：右上角「全选」勾选后进入选择态 */
+    /** 批量选择删除：右上角「选择」进入选择态，选择态内再「全选/取消全选」 */
     private final Set<Long> selected = new HashSet<>();
-    private TextView tvTitle, btnSelDelete;
-    private CheckBox cbSelectAll;
+    private boolean selectMode;
+    private TextView tvTitle, btnSelDelete, btnSelect, btnSelectAll;
     private View fab, selBar;
 
     /** 名称搜索：输入即时出结果，点结果直达该层级 */
     private EditText etSearch;
     private View searchPanel;
     private ListView searchList;
+    private Drawable searchIcon, clearIcon;
     private final List<Store.Node> searchResults = new ArrayList<>();
     private final List<String> searchLocs = new ArrayList<>();
 
@@ -68,7 +70,8 @@ public class MainActivity extends Activity {
         seedIfNeeded();
 
         tvTitle = findViewById(R.id.tvTitle);
-        cbSelectAll = findViewById(R.id.cbSelectAll);
+        btnSelect = findViewById(R.id.btnSelect);
+        btnSelectAll = findViewById(R.id.btnSelectAll);
         selBar = findViewById(R.id.selBar);
         btnSelDelete = findViewById(R.id.btnSelDelete);
         fab = findViewById(R.id.fab);
@@ -78,7 +81,7 @@ public class MainActivity extends Activity {
         grid.setAdapter(adapter);
         grid.setOnItemClickListener((p, v, pos, id) -> {
             Store.Node n = spaces.get(pos);
-            if (!selected.isEmpty()) {
+            if (selectMode) {
                 toggleSelected(n.id);
                 return;
             }
@@ -87,7 +90,9 @@ public class MainActivity extends Activity {
         });
         grid.setOnItemLongClickListener((p, v, pos, id) -> {
             v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            showSpaceMenu(spaces.get(pos));
+            // 选择态下长按与点击一致：切换勾选，不弹菜单
+            if (selectMode) toggleSelected(spaces.get(pos).id);
+            else showSpaceMenu(spaces.get(pos));
             return true;
         });
         grid.setEmptyView(findViewById(R.id.empty));
@@ -101,22 +106,23 @@ public class MainActivity extends Activity {
 
         findViewById(R.id.btnSidebar).setOnClickListener(v -> Sidebar.show(this));
 
-        // 右上角全选框：勾选进入选择态，可再点单个卡片调整；取消勾选整体退出
-        cbSelectAll.setOnClickListener(v -> {
-            if (spaces.isEmpty()) {
-                cbSelectAll.setChecked(false);
-                Ui.toast(this, "还没有收纳空间");
-                return;
-            }
-            if (cbSelectAll.isChecked()) {
-                for (Store.Node n : spaces) selected.add(n.id);
-            } else {
-                selected.clear();
-            }
+        // 右上角「选择」进入选择态；选择态内点卡片逐个勾选，「全选/取消全选」一键切换
+        btnSelect.setOnClickListener(v -> {
+            if (spaces.isEmpty()) return;
+            selectMode = true;
+            selected.clear();
             updateSelUi();
             adapter.notifyDataSetChanged();
         });
-        findViewById(R.id.btnSelCancel).setOnClickListener(v -> clearSelection());
+        btnSelectAll.setOnClickListener(v -> {
+            if (spaces.isEmpty()) return;
+            boolean all = selected.size() == spaces.size();
+            selected.clear();
+            if (!all) for (Store.Node n : spaces) selected.add(n.id);
+            updateSelUi();
+            adapter.notifyDataSetChanged();
+        });
+        findViewById(R.id.btnSelCancel).setOnClickListener(v -> exitSelectMode());
         btnSelDelete.setOnClickListener(v -> confirmDeleteSelected());
 
         setupSearch();
@@ -130,8 +136,8 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (!selected.isEmpty()) {
-            clearSelection();
+        if (selectMode) {
+            exitSelectMode();
             return;
         }
         if (searchPanel != null && searchPanel.getVisibility() == View.VISIBLE) {
@@ -155,10 +161,6 @@ public class MainActivity extends Activity {
         super.onResume();
         if (themeSeqApplied != Ui.themeSeq()) recreate();
         reload();
-        // 层级页里可能改名/删除，回首页时刷新搜索结果
-        if (searchPanel != null && searchPanel.getVisibility() == View.VISIBLE) {
-            runSearch(etSearch.getText().toString().trim());
-        }
     }
 
     private void reload() {
@@ -169,9 +171,19 @@ public class MainActivity extends Activity {
             for (Store.Node n : spaces) ids.add(n.id);
             selected.retainAll(ids);
         }
+        // 选择态下内容被清空（如全部删完）则退出
+        if (selectMode && spaces.isEmpty()) selectMode = false;
         adapter.notifyDataSetChanged();
         updateSelUi();
+        refreshSearchIfVisible();
         maybeTipLongPress();
+    }
+
+    /** 数据变化后刷新搜索结果：面板可能仍显示已删除/过期的条目 */
+    private void refreshSearchIfVisible() {
+        if (searchPanel != null && searchPanel.getVisibility() == View.VISIBLE) {
+            runSearch(etSearch.getText().toString().trim());
+        }
     }
 
     /** 首页长按卡片（重命名/删除）无可见入口，首次有内容时提示一次 */
@@ -192,10 +204,14 @@ public class MainActivity extends Activity {
         searchList.setEmptyView(findViewById(R.id.searchEmpty));
         searchList.setAdapter(new SearchAdapter());
 
-        // 搜索图标作复合Drawable：代码里设置并缩放，兼容低版本且保证白色
-        Drawable icon = getResources().getDrawable(R.drawable.ic_search);
-        icon.setBounds(0, 0, Ui.dp(this, 18), Ui.dp(this, 18));
-        etSearch.setCompoundDrawables(icon, null, null, null);
+        // 搜索图标作复合Drawable：代码里缩放并着色，兼容低版本
+        searchIcon = getResources().getDrawable(R.drawable.ic_search);
+        searchIcon.setBounds(0, 0, Ui.dp(this, 18), Ui.dp(this, 18));
+        searchIcon.setTint(getResources().getColor(R.color.primary));
+        clearIcon = getResources().getDrawable(R.drawable.ic_clear);
+        clearIcon.setBounds(0, 0, Ui.dp(this, 16), Ui.dp(this, 16));
+        clearIcon.setTint(getResources().getColor(R.color.onSurfaceVariant));
+        etSearch.setCompoundDrawables(searchIcon, null, null, null);
         etSearch.setCompoundDrawablePadding(Ui.dp(this, 8));
 
         etSearch.addTextChangedListener(new TextWatcher() {
@@ -209,8 +225,22 @@ public class MainActivity extends Activity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                boolean has = s.length() > 0;
+                // 有内容时右侧显示 ×，一键清空
+                etSearch.setCompoundDrawables(searchIcon, null, has ? clearIcon : null, null);
                 runSearch(s.toString().trim());
             }
+        });
+        etSearch.setOnTouchListener((v, e) -> {
+            if (e.getAction() == MotionEvent.ACTION_UP) {
+                Drawable clear = etSearch.getCompoundDrawables()[2];
+                if (clear != null && e.getX() >= etSearch.getWidth()
+                        - etSearch.getPaddingRight() - clear.getBounds().width()) {
+                    etSearch.setText("");
+                    return true;
+                }
+            }
+            return false;
         });
         searchList.setOnItemClickListener((p, v, pos, id) -> openNode(searchResults.get(pos).id));
     }
@@ -242,7 +272,11 @@ public class MainActivity extends Activity {
     /** 携带完整层级链跳转：返回键可逐级回退，面包屑也正确 */
     private void openNode(long id) {
         List<Store.Node> chain = store.path(id);
-        if (chain.isEmpty()) return;
+        if (chain.isEmpty()) {
+            // 节点已被删除（结果过期）：刷新结果列表
+            runSearch(etSearch.getText().toString().trim());
+            return;
+        }
         long[] ids = new long[chain.size()];
         for (int i = 0; i < ids.length; i++) ids[i] = chain.get(i).id;
         hideKeyboard();
@@ -287,7 +321,7 @@ public class MainActivity extends Activity {
             }
             Store.Node n = searchResults.get(i);
             TextView tile = v.findViewById(R.id.tile);
-            tile.setText(n.name.substring(0, 1));
+            tile.setText(Ui.firstChar(n.name));
             GradientDrawable bg = new GradientDrawable();
             bg.setShape(GradientDrawable.RECTANGLE);
             bg.setCornerRadius(Ui.dp(MainActivity.this, 13));
@@ -307,7 +341,8 @@ public class MainActivity extends Activity {
         adapter.notifyDataSetChanged();
     }
 
-    private void clearSelection() {
+    private void exitSelectMode() {
+        selectMode = false;
         selected.clear();
         updateSelUi();
         adapter.notifyDataSetChanged();
@@ -315,11 +350,14 @@ public class MainActivity extends Activity {
 
     private void updateSelUi() {
         boolean any = !selected.isEmpty();
-        cbSelectAll.setChecked(any && selected.size() == spaces.size());
-        if (any) tvTitle.setText("已选 " + selected.size() + " 项");
+        boolean all = any && selected.size() == spaces.size();
+        btnSelect.setVisibility(!selectMode && !spaces.isEmpty() ? View.VISIBLE : View.GONE);
+        btnSelectAll.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        btnSelectAll.setText(all ? R.string.deselect_all : R.string.select_all);
+        if (selectMode) tvTitle.setText(any ? "已选 " + selected.size() + " 项" : "请选择要删除的空间");
         else tvTitle.setText(R.string.app_name);
-        fab.setVisibility(any ? View.GONE : View.VISIBLE);
-        selBar.setVisibility(any ? View.VISIBLE : View.GONE);
+        fab.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        selBar.setVisibility(selectMode ? View.VISIBLE : View.GONE);
         btnSelDelete.setEnabled(any);
         btnSelDelete.setAlpha(any ? 1f : 0.5f);
     }
@@ -333,6 +371,7 @@ public class MainActivity extends Activity {
                     for (long id : ids) store.deleteNodeDeep(id);
                     thumbCache.clear();
                     Ui.toast(this, "已删除 " + ids.size() + " 个空间");
+                    exitSelectMode();
                     reload();
                 });
     }
@@ -404,12 +443,13 @@ public class MainActivity extends Activity {
 
             Bitmap bmp = null;
             if (!pics.isEmpty()) {
-                File tf = store.thumbFile(pics.get(0).thumb);
+                String thumbName = pics.get(0).thumb;
+                File tf = store.thumbFile(thumbName);
                 if (tf.exists()) {
-                    bmp = thumbCache.get(n.id);
+                    bmp = thumbCache.get(thumbName);
                     if (bmp == null) {
                         bmp = Store.decodeScaled(tf, 260);
-                        if (bmp != null) thumbCache.put(n.id, bmp);
+                        if (bmp != null) thumbCache.put(thumbName, bmp);
                     }
                 }
             }
@@ -421,7 +461,7 @@ public class MainActivity extends Activity {
                 cover.setImageDrawable(null);
                 cover.setVisibility(View.GONE);
                 letter.setVisibility(View.VISIBLE);
-                letter.setText(n.name.substring(0, 1));
+                letter.setText(Ui.firstChar(n.name));
                 letter.setBackgroundColor(Ui.tileColor(n.id));
             }
 

@@ -100,7 +100,7 @@ public final class Sidebar {
         slogan.setTextSize(12);
         slogan.setPadding(0, Ui.dp(c, 4), 0, 0);
         TextView ver = new TextView(c);
-        ver.setText("v" + About.versionName(c) + " · 完全离线 · 无需权限");
+        ver.setText("v" + About.versionName(c) + " · 不联网 · 无需权限");
         ver.setTextColor(c.getResources().getColor(R.color.onHeaderFaint));
         ver.setTextSize(11);
         ver.setPadding(0, Ui.dp(c, 6), 0, 0);
@@ -115,7 +115,7 @@ public final class Sidebar {
             dismissPanel(p);
             Backup.showMenu(act);
         }));
-        p.addView(item(c, "检查更新", "最新版本下载 · 浏览器打开",
+        p.addView(item(c, "获取新版本", "浏览器打开 GitHub 发布页",
                 R.drawable.ic_open, R.color.iconUpdate, () -> {
             dismissPanel(p);
             String url = About.REPO_URL + "/releases";
@@ -125,7 +125,7 @@ public final class Sidebar {
                 copyLink(act, url);
             }
         }));
-        p.addView(item(c, "关于与联系", "作者 · QQ群 · 赞助 · 开源协议",
+        p.addView(item(c, "关于与联系", "作者 · QQ群 · 赞助",
                 R.drawable.ic_info, R.color.iconAbout, () -> {
             dismissPanel(p);
             act.startActivity(new Intent(act, AboutActivity.class));
@@ -178,6 +178,9 @@ public final class Sidebar {
 
         LinearLayout txt = new LinearLayout(c);
         txt.setOrientation(LinearLayout.VERTICAL);
+        // 文字列占满剩余宽度，保证右侧箭头统一贴右对齐
+        txt.setLayoutParams(new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         TextView t = new TextView(c);
         t.setText(title);
         t.setTextColor(c.getResources().getColor(R.color.onSurface));
@@ -194,7 +197,7 @@ public final class Sidebar {
         ImageView arrow = new ImageView(c);
         arrow.setImageResource(R.drawable.ic_chevron_right);
         arrow.setImageTintList(ColorStateList.valueOf(c.getResources().getColor(R.color.arrowDim)));
-        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(0, Ui.dp(c, 20), 1f);
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(Ui.dp(c, 20), Ui.dp(c, 20));
         alp.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
         arrow.setLayoutParams(alp);
         row.addView(arrow);
@@ -270,7 +273,12 @@ public final class Sidebar {
             t.setTypeface(on ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
             t.setTextColor(c.getResources().getColor(
                     on ? R.color.onPrimary : R.color.onSurfaceVariant));
-            s.addView(t);
+            t.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            // 显式声明水平居中：部分机型垂直 LinearLayout 子项不继承容器的 setGravity，会退化为左对齐
+            tlp.gravity = Gravity.CENTER_HORIZONTAL;
+            s.addView(t, tlp);
 
             LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(0,
                     ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
