@@ -911,6 +911,18 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
     }
 
     @Override
+    public void onPhotoSwipe(int dir) {
+        // 大图左右快滑切换上一张/下一张：放置模式不切，只有一张也没有切换意义
+        if (placing || pics.size() < 2) return;
+        if (isGallery() && !galleryViewing) return;
+        int cur = currentPic >= 0 ? currentPic : (dir > 0 ? -1 : pics.size());
+        int next = cur + dir;
+        if (next < 0 || next >= pics.size()) return;
+        iv.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+        showPic(next);
+    }
+
+    @Override
     public void onHotspotLongPress(Store.Hotspot h) {
         iv.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         Store.Node child = store.node(h.childId);

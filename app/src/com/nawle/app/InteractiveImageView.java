@@ -30,6 +30,9 @@ public class InteractiveImageView extends View {
 
         /** 长按落在照片空白处（未命中交互点） */
         void onImageLongPress();
+
+        /** 大图横向快滑切换照片：dir=-1 上一张，+1 下一张；仅在整图横向放得下（无可拖余量）时触发 */
+        void onPhotoSwipe(int dir);
     }
 
     private Bitmap bitmap;
@@ -126,6 +129,21 @@ public class InteractiveImageView extends View {
                 } else if (host != null && bitmap != null) {
                     host.onImageLongPress();
                 }
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float vx, float vy) {
+                if (e1 == null || e2 == null || bitmap == null || host == null) return false;
+                // 缩放后照片比视口宽、还能横向拖动时，横向手势归拖动所有，不切照片
+                matrix.getValues(mValues);
+                float w = bitmap.getWidth() * mValues[Matrix.MSCALE_X];
+                if (w > getWidth()) return false;
+                // 只认明确的横向快滑：速度以横向为主、够快，且确实滑出了一段距离
+                if (Math.abs(vx) <= Math.abs(vy)) return false;
+                if (Math.abs(vx) < Ui.dp(getContext(), 500)) return false;
+                if (Math.abs(e2.getX() - e1.getX()) < Ui.dp(getContext(), 24)) return false;
+                host.onPhotoSwipe(vx < 0 ? 1 : -1);
+                return true;
             }
 
             @Override

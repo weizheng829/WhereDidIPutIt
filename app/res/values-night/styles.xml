@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 夜间主题覆盖：与 values/ 中同名 style 整体替换（style 不会跨资源目录合并）。
-     默认芒果主题无需在此覆盖主题色——其色值引用 @color，由 values-night/colors.xml 切换。 -->
+     默认芒果主题的色值走 @color 资源，由 values-night/colors.xml 切换；
+     但「attr → @color」的映射本身仍须在夜间版 style 里完整重列。 -->
 <resources>
     <!-- 夜间基础：深色 Theme.Material，框架属性同样映射到主题属性 -->
     <style name="AppBaseNight" parent="@android:style/Theme.Material.NoActionBar">
@@ -17,10 +18,51 @@
         <item name="android:forceDarkAllowed">false</item>
     </style>
 
-    <!-- 芒果橙（默认）：仅覆盖框架映射到深色父主题，色值仍走 @color 资源 -->
+    <!-- 芒果橙（默认）：色值映射引用 @color 资源，@color 的昼夜差异由 values-night/colors.xml
+         自动切换。注意 style 不跨资源目录合并，夜间版必须完整重列全部主题属性，
+         缺一条对应 ?attr 就解析失败（涟漪/图层 drawable 直接抛 NotFoundException 闪退）。 -->
     <style name="AppTheme" parent="AppBaseNight">
         <item name="android:alertDialogTheme">@style/AppDialog</item>
         <item name="android:windowLightNavigationBar">false</item>
+        <item name="primary">@color/primary</item>
+        <item name="onPrimary">@color/onPrimary</item>
+        <item name="primaryDeep">@color/primaryDeep</item>
+        <item name="primaryContainer">@color/primaryContainer</item>
+        <item name="onPrimaryContainer">@color/onPrimaryContainer</item>
+        <item name="accent">@color/accent</item>
+        <item name="accentDeep">@color/accentDeep</item>
+        <item name="onAccent">@color/onAccent</item>
+        <item name="onDanger">@color/onDanger</item>
+        <item name="surface">@color/surface</item>
+        <item name="cardBg">@color/cardBg</item>
+        <item name="onSurface">@color/onSurface</item>
+        <item name="onSurfaceVariant">@color/onSurfaceVariant</item>
+        <item name="outlineVariant">@color/outlineVariant</item>
+        <item name="divider">@color/divider</item>
+        <item name="headerBg">@color/headerBg</item>
+        <item name="onHeader">@color/onHeader</item>
+        <item name="onHeaderDim">@color/onHeaderDim</item>
+        <item name="onHeaderFaint">@color/onHeaderFaint</item>
+        <item name="statusBarBg">@color/statusBarBg</item>
+        <item name="navBarBg">@color/navBarBg</item>
+        <item name="scrim">@color/scrim</item>
+        <item name="photoBg">@color/photoBg</item>
+        <item name="stripBg">@color/stripBg</item>
+        <item name="hintBarBg">@color/hintBarBg</item>
+        <item name="hintBarText">@color/hintBarText</item>
+        <item name="chipBg">@color/chipBg</item>
+        <item name="chipText">@color/chipText</item>
+        <item name="tileLetter">@color/tileLetter</item>
+        <item name="dialogAccent">@color/dialogAccent</item>
+        <item name="controlHighlight">@color/controlHighlight</item>
+        <item name="arrowDim">@color/arrowDim</item>
+        <item name="crumbPillStroke">@color/crumbPillStroke</item>
+        <item name="danger">@color/danger</item>
+        <item name="selScrim">@color/selScrim</item>
+        <item name="searchBarBg">@color/searchBarBg</item>
+        <item name="searchBarStroke">@color/searchBarStroke</item>
+        <item name="headerPillBg">@color/headerPillBg</item>
+        <item name="headerPillRipple">@color/headerPillRipple</item>
     </style>
 
     <!-- 经典青 · 夜间 -->
