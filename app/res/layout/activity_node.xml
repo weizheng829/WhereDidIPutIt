@@ -167,6 +167,7 @@
 
         <Button
             android:id="@+id/btnHotspot"
+            android:stateListAnimator="@null"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
@@ -185,6 +186,7 @@
 
         <Button
             android:id="@+id/btnExpand"
+            android:stateListAnimator="@null"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
@@ -203,6 +205,7 @@
         <!-- 相册查看大图时：对当前照片的可见操作入口 -->
         <Button
             android:id="@+id/btnRenamePic"
+            android:stateListAnimator="@null"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
@@ -222,6 +225,7 @@
 
         <Button
             android:id="@+id/btnDeletePic"
+            android:stateListAnimator="@null"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"

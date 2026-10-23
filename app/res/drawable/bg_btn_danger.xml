@@ -4,7 +4,12 @@
     <item>
         <shape android:shape="rectangle">
             <solid android:color="?attr/danger" />
-            <corners android:radius="24dp" />
+            <!-- 四角显式写半径：部分 ROM 会改写 android:radius 导致底部两角圆角塌掉 -->
+            <corners
+                android:topLeftRadius="24dp"
+                android:topRightRadius="24dp"
+                android:bottomLeftRadius="24dp"
+                android:bottomRightRadius="24dp" />
         </shape>
     </item>
 </ripple>

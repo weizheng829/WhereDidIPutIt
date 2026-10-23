@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
@@ -17,6 +19,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -142,6 +145,27 @@ public final class Ui {
 
     public static int dp(Context c, float v) {
         return Math.round(v * c.getResources().getDisplayMetrics().density);
+    }
+
+    /**
+     * 底部导航栏（手势条）避让高度：优先取窗口上报的导航栏 insets（edge-to-edge 布局时有值）。
+     * 部分 ROM 的「应用全面屏」兼容模式会把窗口强制铺到手势条之下却不上报 insets，
+     * 此时检测到窗口可见区已延伸到屏幕底部，就改用系统 navigation_bar_height 资源兜底
+     * （上限 32dp，防止个别 ROM 在三键导航下资源值偏大时垫得过多）。
+     * 常规窗口（导航栏在窗口之外）返回 0，不额外占空间。
+     */
+    public static int navBottomInset(Activity act, WindowInsets ins) {
+        int inset = ins == null ? 0 : ins.getSystemWindowInsetBottom();
+        if (inset > 0) return inset;
+        int rid = act.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        int nav = rid > 0 ? act.getResources().getDimensionPixelSize(rid) : 0;
+        if (nav <= 0) return 0;
+        Rect frame = new Rect();
+        act.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
+        Point real = new Point();
+        act.getWindowManager().getDefaultDisplay().getRealSize(real);
+        boolean overNav = frame.bottom >= real.y - nav / 2;
+        return overNav ? Math.min(nav, dp(act, 32)) : 0;
     }
 
     /** 跟随系统字体缩放的 sp 尺寸（用于画布绘制文字） */

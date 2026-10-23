@@ -79,17 +79,16 @@ public class MainActivity extends Activity {
         selBar = findViewById(R.id.selBar);
         btnSelDelete = findViewById(R.id.btnSelDelete);
         fab = findViewById(R.id.fab);
-        // 底部悬浮件避让手势条：在基础下边距上叠加导航栏 insets
-        // （系统已让出导航栏时 insets 为 0，仅取布局基础值；edge-to-edge 布局时取实际高度）
+        // 底部悬浮件避让手势条：基础下边距叠加导航栏避让高度（见 Ui.navBottomInset）
         ViewGroup.MarginLayoutParams selLp = (ViewGroup.MarginLayoutParams) selBar.getLayoutParams();
         selBar.setOnApplyWindowInsetsListener((v, ins) -> {
-            selLp.bottomMargin = Ui.dp(this, 28) + ins.getSystemWindowInsetBottom();
+            selLp.bottomMargin = Ui.dp(this, 28) + Ui.navBottomInset(this, ins);
             v.requestLayout();
             return ins;
         });
         ViewGroup.MarginLayoutParams fabLp = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
         fab.setOnApplyWindowInsetsListener((v, ins) -> {
-            fabLp.bottomMargin = Ui.dp(this, 24) + ins.getSystemWindowInsetBottom();
+            fabLp.bottomMargin = Ui.dp(this, 24) + Ui.navBottomInset(this, ins);
             v.requestLayout();
             return ins;
         });

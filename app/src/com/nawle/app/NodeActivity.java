@@ -134,11 +134,10 @@ public class NodeActivity extends Activity implements InteractiveImageView.Host 
         emptyView = findViewById(R.id.emptyView);
         hintBar = findViewById(R.id.hintBar);
         bottomBar = findViewById(R.id.bottomBar);
-        // 底栏避让手势条：在基础内边距上叠加导航栏 insets
-        // （系统已让出导航栏时 insets 为 0，仅取布局基础值；edge-to-edge 布局时取实际高度）
+        // 底栏避让手势条：基础内边距叠加导航栏避让高度（见 Ui.navBottomInset）
         bottomBar.setOnApplyWindowInsetsListener((v, ins) -> {
             bottomBar.setPadding(bottomBar.getPaddingLeft(), bottomBar.getPaddingTop(),
-                    bottomBar.getPaddingRight(), Ui.dp(this, 20) + ins.getSystemWindowInsetBottom());
+                    bottomBar.getPaddingRight(), Ui.dp(this, 20) + Ui.navBottomInset(this, ins));
             return ins;
         });
         btnHotspot = findViewById(R.id.btnHotspot);
