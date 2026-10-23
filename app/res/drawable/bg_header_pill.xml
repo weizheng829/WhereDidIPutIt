@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 头部胶囊按钮（管理 / 全选）：半透明白底 + 涟漪，深浅色头部上都可区分 -->
+<!-- 头部胶囊按钮（选择 / 全选）：色调随昼夜切换（浅色=深棕玻璃底，夜间=白玻璃底） -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="#40FFFFFF">
+    android:color="?attr/headerPillRipple">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/headerPillBg" />
+            <solid android:color="?attr/headerPillBg" />
             <corners android:radius="16dp" />
         </shape>
     </item>

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class Db extends SQLiteOpenHelper {
 
     public Db(Context ctx) {
-        super(ctx, "nawle.db", null, 1);
+        super(ctx, "nawle.db", null, 2);
     }
 
     @Override
@@ -17,12 +17,14 @@ public class Db extends SQLiteOpenHelper {
                 "parent_id INTEGER NOT NULL DEFAULT 0," +
                 "name TEXT NOT NULL," +
                 "note TEXT DEFAULT ''," +
+                "kind INTEGER NOT NULL DEFAULT 0," +
                 "created_at INTEGER)");
         db.execSQL("CREATE TABLE images(" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "node_id INTEGER NOT NULL," +
                 "file TEXT NOT NULL," +
                 "thumb TEXT NOT NULL," +
+                "label TEXT NOT NULL DEFAULT ''," +
                 "created_at INTEGER)");
         db.execSQL("CREATE TABLE hotspots(" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -37,6 +39,10 @@ public class Db extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // v1
+        // v2：nodes.kind 标记展开（相册）节点；images.label 记录相册内照片命名
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE nodes ADD COLUMN kind INTEGER NOT NULL DEFAULT 0");
+            db.execSQL("ALTER TABLE images ADD COLUMN label TEXT NOT NULL DEFAULT ''");
+        }
     }
 }

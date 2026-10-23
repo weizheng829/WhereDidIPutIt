@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 赞赏码切换 tab 选中态：accent 底 + onAccent 字 -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#26000000">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/accent" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+</ripple>

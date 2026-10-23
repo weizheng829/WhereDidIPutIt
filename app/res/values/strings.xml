@@ -3,6 +3,43 @@
     <string name="app_name">收哪了</string>
     <string name="app_slogan">家里东西收哪了？拍下来，点一点，就找到</string>
 
+    <!-- 通用按钮与提示 -->
+    <string name="btn_ok">确定</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_close">关闭</string>
+    <string name="btn_delete">删除</string>
+    <string name="toast_empty_input">内容不能为空</string>
+
+    <!-- 侧边栏 -->
+    <string name="sidebar_ver_fmt">v%1$s · 不联网 · 无需权限</string>
+    <string name="menu_backup">备份与恢复</string>
+    <string name="menu_backup_sub">导出 zip / 换手机时导入</string>
+    <string name="menu_update">获取新版本</string>
+    <string name="menu_update_sub">浏览器打开 GitHub 发布页</string>
+    <!-- 语言菜单项与弹窗标题双语固定显示，任何语言下都可辨识 -->
+    <string name="menu_language" translatable="false">切换语言</string>
+    <string name="menu_language_en" translatable="false">Switch Language</string>
+    <string name="current_option">当前</string>
+    <string name="menu_theme">切换主题</string>
+    <string name="menu_theme_sub">选择配色方案</string>
+    <string name="theme_mango">芒果橙（默认）</string>
+    <string name="theme_teal">经典青</string>
+    <string name="theme_burnt">烧橙</string>
+    <string name="theme_amber">琥珀</string>
+    <string name="theme_terracotta">陶土红</string>
+    <string name="theme_brown">可可棕</string>
+    <string name="menu_about">关于与联系</string>
+    <string name="menu_about_sub">作者 · QQ群 · 赞助</string>
+    <string name="label_appearance">外观</string>
+    <string name="follow_system">跟随系统</string>
+    <string name="appearance_light">浅色</string>
+    <string name="appearance_dark">深色</string>
+    <!-- 语言选项按「自名」原则显示：中文永远显示「中文」，English 永远显示「English」 -->
+    <string name="lang_zh" translatable="false">中文</string>
+    <string name="lang_en" translatable="false">English</string>
+    <string name="clip_update_link">发布页链接</string>
+    <string name="toast_no_browser_link_copied">没有浏览器，链接已复制</string>
+
     <!-- 首页 -->
     <string name="main_empty">还没有收纳空间\n点击右下角 ＋ 创建一个</string>
     <string name="cd_open_menu">打开菜单</string>
@@ -10,11 +47,37 @@
     <string name="select">选择</string>
     <string name="select_all">全选</string>
     <string name="deselect_all">取消全选</string>
-    <string name="btn_cancel">取消</string>
-    <string name="btn_delete">删除</string>
     <string name="search_hint">搜索物品或收纳位，如：手表</string>
     <string name="search_empty">没有找到相关内容</string>
     <string name="cd_search">搜索</string>
+    <string name="dlg_new_space">新建收纳空间</string>
+    <string name="hint_new_space">例如：卧室、阳台、储物间</string>
+    <string name="toast_space_created_fmt">已创建「%1$s」，点开它添加照片吧</string>
+    <string name="tip_longpress_main">小提示：长按卡片可重命名或删除空间</string>
+    <string name="search_loc_top">位于首页的收纳空间</string>
+    <string name="sel_count_fmt">已选 %1$d 项</string>
+    <string name="sel_pick_hint">请选择要删除的空间</string>
+    <string name="dlg_delete_selected">删除所选空间</string>
+    <string name="dlg_delete_selected_msg_fmt">将删除所选 %1$d 个空间及其全部子层级、照片和交互点，不可恢复。</string>
+    <string name="toast_deleted_fmt">已删除 %1$d 个空间</string>
+    <string name="fmt_sublevels">%1$d 个子层级</string>
+    <string name="fmt_pics">%1$d 张照片</string>
+    <string name="fmt_storages">%1$d 个收纳位</string>
+    <string name="sub_empty">还没有内容</string>
+    <string name="no_photos_yet">还没照片</string>
+    <string name="note_marker">" · 备"</string>
+    <string name="dlg_rename_space">重命名空间</string>
+    <string name="sub_delete_subtree">将删除全部子层级和照片，不可恢复</string>
+    <string name="dlg_delete_space">删除空间</string>
+    <string name="dlg_delete_subtree_msg_fmt">将删除「%1$s」及其全部子层级和照片，不可恢复。</string>
+
+    <!-- 首次启动示例空间 -->
+    <string-array name="seed_spaces">
+        <item>卧室</item>
+        <item>客厅</item>
+        <item>阳台</item>
+        <item>办公室</item>
+    </string-array>
 
     <!-- 层级页 -->
     <string name="cd_back">返回上一级</string>
@@ -22,24 +85,121 @@
     <string name="cd_add_photo">添加照片</string>
     <string name="add_photo">添加照片</string>
     <string name="add_hotspot">添加交互点</string>
+    <string name="add_expand">添加展开</string>
     <string name="cancel_placing">取消放置</string>
     <string name="first_photo">拍第一张照片</string>
     <string name="hint_placing">放置模式：点击照片上的目标位置（如某个抽屉），为它命名即可创建交互点</string>
     <string name="hint_longpress">小提示：长按底部缩略图可设封面或删除照片；长按照片上的圆点可打开、重命名或删除收纳位</string>
+    <string name="hint_longpress_sub">小提示：长按底部缩略图可删除照片；长按照片上的圆点可打开、重命名或删除收纳位</string>
     <string name="node_empty_title">这个位置还没有照片</string>
     <string name="node_empty_body">先拍一张这里的外观照（柜子、抽屉、箱子…）\n然后在照片上放置交互点，逐层记录</string>
     <string name="photo_desc">第 %1$d 张照片</string>
+    <string name="crumb_home">首页</string>
+    <string name="sheet_photo_ops">照片操作</string>
+    <string name="fmt_photo_n_of_m">第 %1$d 张 / 共 %2$d 张</string>
+    <string name="act_set_cover">设为封面</string>
+    <string name="act_set_cover_sub">移到最前，作为这个层级的封面</string>
+    <string name="toast_cover_set">已设为封面</string>
+    <string name="act_delete_photo">删除这张照片</string>
+    <string name="sub_delete_photo">照片上的交互点会一并删除</string>
+    <string name="dlg_delete_photo">删除照片</string>
+    <string name="dlg_delete_photo_msg">删除后不可恢复，照片上的交互点也会一并删除。</string>
+    <string name="act_camera">拍照</string>
+    <string name="act_camera_sub">使用相机拍摄新照片</string>
+    <string name="act_gallery">从相册选择</string>
+    <string name="act_gallery_sub">可一次选择多张</string>
+    <string name="toast_no_camera">没有可用的相机应用</string>
+    <string name="toast_no_gallery">没有可用的相册应用</string>
+    <string name="toast_capture_failed">拍照失败，请重试</string>
+    <string name="toast_read_failed">无法读取所选图片</string>
+    <string name="progress_saving_photos">正在保存照片…</string>
+    <string name="toast_saved_fmt">已保存 %1$d 张照片</string>
+    <string name="toast_save_failed">保存失败，请重试</string>
+    <string name="toast_need_photo_first">请先添加一张照片，再放置交互点</string>
+    <string name="suggest_name_fmt">收纳位%1$d</string>
+    <string name="dlg_name_spot">命名这个收纳位</string>
+    <string name="hint_name_spot">例如：抽屉1、上层、工具箱</string>
+    <string name="toast_spot_created_fmt">已创建「%1$s」，点按圆点进入，长按圆点可改名或删除</string>
+    <string name="default_child_name">子项</string>
+    <string name="sheet_spot_sub">收纳位 · 交互点</string>
+    <string name="act_open">打开</string>
+    <string name="act_rename">重命名</string>
+    <string name="act_remove_pin">移除标记</string>
+    <string name="act_remove_pin_sub">仅移除照片上的圆点，保留子项内容</string>
+    <string name="act_delete_child">删除子项及全部内容</string>
+    <string name="sub_delete_child_fmt">将删除「%1$s」及其全部子层级和照片</string>
+    <string name="dlg_delete_child">删除子项</string>
+    <string name="sheet_menu_sub">当前层级 · 长按缩略图或圆点可管理</string>
+    <string name="act_edit_note">编辑备注</string>
+    <string name="act_edit_note_sub">记录这里的存放说明</string>
+    <string name="dlg_note">备注</string>
+    <string name="hint_note">记录这里的存放说明</string>
+    <string name="toast_note_saved">备注已保存</string>
+    <string name="act_child_list">查看子项列表</string>
+    <string name="act_sidebar">侧边栏（备份 / 外观 / 语言 / 关于）</string>
+    <string name="act_delete_level">删除本层级</string>
+    <string name="toast_no_children">还没有子项：先添加照片，再放置交互点</string>
+    <string name="sheet_child_list">子项列表</string>
+    <string name="fmt_total_spots">共 %1$d 个收纳位</string>
+    <string name="empty_need_photo">请先添加照片，再放置交互点</string>
+    <string name="empty_no_photos">暂无照片</string>
+
+    <!-- 层级页：展开（相册） -->
+    <string name="hint_placing_album">放置模式：点击照片上的目标位置，创建一个可点开的相册（展开），里面可以收纳很多照片</string>
+    <string name="toast_need_photo_first_album">请先添加一张照片，再放置展开</string>
+    <string name="suggest_album_name_fmt">相册%1$d</string>
+    <string name="dlg_name_album">命名这个相册</string>
+    <string name="hint_name_album">例如：药品、说明书、纪念品</string>
+    <string name="toast_album_created_fmt">已创建「%1$s」，点按标签进入相册，可往里添加照片</string>
+    <string name="album_empty_title">这个相册还没有照片</string>
+    <string name="album_empty_body">点「添加照片」把照片收进来\n点照片右上的 ⋮ 可命名或删除，长按可拖动排序</string>
+    <string name="album_menu_sub_fmt">相册 · 共 %1$d 张照片</string>
+    <string name="act_rename_photo">重命名照片</string>
+    <string name="dlg_rename_photo">重命名照片</string>
+    <string name="hint_rename_photo">给这张照片起个名字，例如：感冒药</string>
+    <string name="toast_photo_renamed_fmt">已重命名为「%1$s」</string>
+    <string name="tip_album_longpress">小提示：点照片右上的 ⋮ 可命名或删除；长按住照片可拖动排序</string>
+    <string name="sheet_spot_sub_album">相册 · 交互点</string>
+    <string name="album_item_sub_fmt">相册 · %1$d 张照片</string>
+    <string name="album_item_empty">相册 · 还没有照片</string>
+    <string name="sub_delete_album_level">将删除相册内全部照片，不可恢复</string>
+    <string name="unnamed_photo_time_fmt">未命名 %1$s</string>
+
+    <!-- 备份与恢复 -->
+    <string name="backup_intro">备份是包含全部空间、层级、照片和交互点的一个 zip 文件。\n\n· 换手机：旧手机导出 → 微信/网盘/数据线传到新手机 → 新手机导入\n· 防丢失：建议每隔一段时间导出一份留存</string>
+    <string name="btn_export">导出备份（生成 zip 文件）</string>
+    <string name="btn_import">导入备份（覆盖本机现有数据）</string>
+    <string name="backup_filename_fmt">收哪了-备份-%1$s.zip</string>
+    <string name="toast_no_saf">没有可用的文件选择器</string>
+    <string name="progress_exporting">正在导出备份…</string>
+    <string name="toast_export_failed_fmt">导出失败：%1$s</string>
+    <string name="toast_export_ok">导出成功，请妥善保存该 zip 文件</string>
+    <string name="dlg_import">导入备份</string>
+    <string name="dlg_import_msg">将用备份文件覆盖本机现有全部数据（空间、层级、照片），覆盖后无法恢复。\n\n确定继续吗？</string>
+    <string name="btn_pick_import">选择文件并导入</string>
+    <string name="progress_importing">正在导入备份…</string>
+    <string name="toast_import_ok">导入成功</string>
+    <string name="err_bad_format">备份文件格式不合法</string>
+    <string name="err_not_backup">这不是有效的「收哪了」备份文件</string>
+    <string name="err_read_failed_fmt">读取备份失败：%1$s</string>
+    <string name="err_write_failed_fmt">写入数据失败：%1$s</string>
 
     <!-- 关于页 -->
     <string name="about_title">关于与联系</string>
     <string name="about_tagline">拍照 + 照片上的交互点，逐层记录家里东西收哪了。\n不联网 · 不申请任何权限 · 开源 · 永久免费</string>
     <string name="about_contact">联系作者</string>
     <string name="label_email">邮箱（问题反馈 / 建议）</string>
+    <string name="label_email_short">邮箱</string>
     <string name="btn_copy">复制</string>
+    <string name="toast_copied_fmt">%1$s已复制：%2$s</string>
+    <string name="label_repo">仓库地址</string>
+    <string name="toast_no_browser_repo_copied">没有浏览器，仓库地址已复制</string>
     <string name="about_qq_title">QQ 交流群</string>
     <string name="about_qq_sub">扫码进群，交流用法、反馈问题、催更功能</string>
     <string name="about_donate_title">赞助支持</string>
-    <string name="about_donate_sub">如果这个小工具帮到了你，可以请作者喝杯咖啡 ☕\n（微信 / 支付宝扫一扫）</string>
+    <string name="about_donate_sub">如果这个小工具帮到了你，可以请作者喝杯咖啡 ☕</string>
+    <string name="donate_tab_wechat">微信赞赏</string>
+    <string name="donate_tab_alipay">支付宝赞赏</string>
     <string name="about_license_title">开源与源码</string>
     <string name="about_license_sub">本应用以 MIT 协议开源，永久免费，可自由使用、修改和分发，仅需保留版权声明。</string>
     <string name="btn_license">查看开源协议</string>

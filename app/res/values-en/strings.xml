@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Where Did I Put It</string>
+    <string name="app_slogan">Where did I put it? Snap it, tap it, find it</string>
+
+    <!-- 通用按钮与提示 -->
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_close">Close</string>
+    <string name="btn_delete">Delete</string>
+    <string name="toast_empty_input">Content cannot be empty</string>
+
+    <!-- 侧边栏 -->
+    <string name="sidebar_ver_fmt">v%1$s · Offline · No permissions</string>
+    <string name="menu_backup">Backup &amp; Restore</string>
+    <string name="menu_backup_sub">Export zip / import on a new phone</string>
+    <string name="menu_update">Get Updates</string>
+    <string name="menu_update_sub">Open GitHub releases in browser</string>
+    <string name="current_option">Current</string>
+    <string name="menu_theme">Theme</string>
+    <string name="menu_theme_sub">Pick a color scheme</string>
+    <string name="theme_mango">Mango (default)</string>
+    <string name="theme_teal">Classic Teal</string>
+    <string name="theme_burnt">Burnt Orange</string>
+    <string name="theme_amber">Amber</string>
+    <string name="theme_terracotta">Terracotta</string>
+    <string name="theme_brown">Walnut Brown</string>
+    <string name="menu_about">About &amp; Contact</string>
+    <string name="menu_about_sub">Author · QQ group · Donate</string>
+    <string name="label_appearance">Appearance</string>
+    <string name="follow_system">System</string>
+    <string name="appearance_light">Light</string>
+    <string name="appearance_dark">Dark</string>
+    <string name="clip_update_link">Releases page link</string>
+    <string name="toast_no_browser_link_copied">No browser found. Link copied.</string>
+
+    <!-- 首页 -->
+    <string name="main_empty">No spaces yet\nTap ＋ at the bottom right to create one</string>
+    <string name="cd_open_menu">Open menu</string>
+    <string name="cd_new_space">New space</string>
+    <string name="select">Select</string>
+    <string name="select_all">Select all</string>
+    <string name="deselect_all">Deselect all</string>
+    <string name="search_hint">Search items or spots, e.g. watch</string>
+    <string name="search_empty">Nothing found</string>
+    <string name="cd_search">Search</string>
+    <string name="dlg_new_space">New Space</string>
+    <string name="hint_new_space">e.g. Bedroom, Balcony, Storage</string>
+    <string name="toast_space_created_fmt">Created \"%1$s\". Open it and add photos.</string>
+    <string name="tip_longpress_main">Tip: long-press a card to rename or delete the space</string>
+    <string name="search_loc_top">A space on the home screen</string>
+    <string name="sel_count_fmt">%1$d selected</string>
+    <string name="sel_pick_hint">Select spaces to delete</string>
+    <string name="dlg_delete_selected">Delete Selected Spaces</string>
+    <string name="dlg_delete_selected_msg_fmt">%1$d selected spaces will be deleted, with all their sub-levels, photos and pins. This cannot be undone.</string>
+    <string name="toast_deleted_fmt">Deleted %1$d spaces</string>
+    <string name="fmt_sublevels">%1$d sub-levels</string>
+    <string name="fmt_pics">%1$d photos</string>
+    <string name="fmt_storages">%1$d spots</string>
+    <string name="sub_empty">Nothing here yet</string>
+    <string name="no_photos_yet">No photos yet</string>
+    <string name="note_marker">" · Note"</string>
+    <string name="dlg_rename_space">Rename Space</string>
+    <string name="sub_delete_subtree">Removes all sub-levels and photos. Cannot be undone.</string>
+    <string name="dlg_delete_space">Delete Space</string>
+    <string name="dlg_delete_subtree_msg_fmt">\"%1$s\" and all its sub-levels and photos will be deleted. This cannot be undone.</string>
+
+    <!-- 首次启动示例空间 -->
+    <string-array name="seed_spaces">
+        <item>Bedroom</item>
+        <item>Living Room</item>
+        <item>Balcony</item>
+        <item>Office</item>
+    </string-array>
+
+    <!-- 层级页 -->
+    <string name="cd_back">Back to previous level</string>
+    <string name="cd_more">More actions</string>
+    <string name="cd_add_photo">Add photo</string>
+    <string name="add_photo">Add Photo</string>
+    <string name="add_hotspot">Add Pin</string>
+    <string name="cancel_placing">Cancel Placing</string>
+    <string name="first_photo">Take the First Photo</string>
+    <string name="hint_placing">Placing mode: tap the target spot on the photo (e.g. a drawer) and name it to create a pin</string>
+    <string name="hint_longpress">Tip: long-press a thumbnail below to set cover or delete the photo; long-press a pin on the photo to open, rename or delete the spot</string>
+    <string name="hint_longpress_sub">Tip: long-press a thumbnail below to delete the photo; long-press a pin on the photo to open, rename or delete the spot</string>
+    <string name="node_empty_title">No photos here yet</string>
+    <string name="node_empty_body">Start with a photo of this place (cabinet, drawer, box…)\nThen place pins on the photo, level by level</string>
+    <string name="photo_desc">Photo %1$d</string>
+    <string name="crumb_home">Home</string>
+    <string name="sheet_photo_ops">Photo Actions</string>
+    <string name="fmt_photo_n_of_m">Photo %1$d of %2$d</string>
+    <string name="act_set_cover">Set as Cover</string>
+    <string name="act_set_cover_sub">Move to front as the cover of this level</string>
+    <string name="toast_cover_set">Set as cover</string>
+    <string name="act_delete_photo">Delete This Photo</string>
+    <string name="sub_delete_photo">Pins on this photo will be removed too</string>
+    <string name="dlg_delete_photo">Delete Photo</string>
+    <string name="dlg_delete_photo_msg">This cannot be undone. Pins on this photo will be removed too.</string>
+    <string name="act_camera">Take Photo</string>
+    <string name="act_camera_sub">Capture a new photo with the camera</string>
+    <string name="act_gallery">Choose from Gallery</string>
+    <string name="act_gallery_sub">Select multiple at once</string>
+    <string name="toast_no_camera">No camera app available</string>
+    <string name="toast_no_gallery">No gallery app available</string>
+    <string name="toast_capture_failed">Capture failed. Please try again.</string>
+    <string name="toast_read_failed">Could not read the selected images</string>
+    <string name="progress_saving_photos">Saving photos…</string>
+    <string name="toast_saved_fmt">Saved %1$d photos</string>
+    <string name="toast_save_failed">Save failed. Please try again.</string>
+    <string name="toast_need_photo_first">Add a photo before placing pins</string>
+    <string name="suggest_name_fmt">Spot %1$d</string>
+    <string name="dlg_name_spot">Name This Spot</string>
+    <string name="hint_name_spot">e.g. Drawer 1, Top shelf, Toolbox</string>
+    <string name="toast_spot_created_fmt">Created \"%1$s\". Tap the pin to open it; long-press to rename or delete.</string>
+    <string name="default_child_name">Item</string>
+    <string name="sheet_spot_sub">Spot · Pin</string>
+    <string name="act_open">Open</string>
+    <string name="act_rename">Rename</string>
+    <string name="act_remove_pin">Remove Pin</string>
+    <string name="act_remove_pin_sub">Removes only the pin on the photo; the item itself is kept</string>
+    <string name="act_delete_child">Delete Item and Contents</string>
+    <string name="sub_delete_child_fmt">Deletes \"%1$s\" with all its sub-levels and photos</string>
+    <string name="dlg_delete_child">Delete Item</string>
+    <string name="sheet_menu_sub">Current level · Long-press a thumbnail or pin to manage</string>
+    <string name="act_edit_note">Edit Note</string>
+    <string name="act_edit_note_sub">Note what is stored here</string>
+    <string name="dlg_note">Note</string>
+    <string name="hint_note">What is stored here?</string>
+    <string name="toast_note_saved">Note saved</string>
+    <string name="act_child_list">View Item List</string>
+    <string name="act_sidebar">Sidebar (Backup / Theme / Language / About)</string>
+    <string name="act_delete_level">Delete This Level</string>
+    <string name="toast_no_children">No items yet: add a photo first, then place pins</string>
+    <string name="sheet_child_list">Item List</string>
+    <string name="fmt_total_spots">%1$d spots in total</string>
+    <string name="empty_need_photo">Add a photo to place pins</string>
+    <string name="empty_no_photos">No photos yet</string>
+
+    <!-- 层级页：展开（相册） -->
+    <string name="add_expand">Add Album</string>
+    <string name="hint_placing_album">Placing mode: tap a target spot on the photo to create a tappable album that can hold many photos</string>
+    <string name="toast_need_photo_first_album">Add a photo before placing an album</string>
+    <string name="suggest_album_name_fmt">Album %1$d</string>
+    <string name="dlg_name_album">Name This Album</string>
+    <string name="hint_name_album">e.g. Medicine, Manuals, Keepsakes</string>
+    <string name="toast_album_created_fmt">Created \"%1$s\". Tap its label to open the album and add photos.</string>
+    <string name="album_empty_title">This album is empty</string>
+    <string name="album_empty_body">Tap \"Add Photo\" to collect photos here.\nTap ⋮ on a photo to rename or delete; long-press to drag and reorder</string>
+    <string name="album_menu_sub_fmt">Album · %1$d photos in total</string>
+    <string name="act_rename_photo">Rename Photo</string>
+    <string name="dlg_rename_photo">Rename Photo</string>
+    <string name="hint_rename_photo">Name this photo, e.g. Cold medicine</string>
+    <string name="toast_photo_renamed_fmt">Renamed to \"%1$s\"</string>
+    <string name="tip_album_longpress">Tip: tap ⋮ on a photo to rename or delete it; hold and drag to reorder</string>
+    <string name="sheet_spot_sub_album">Album · Pin</string>
+    <string name="album_item_sub_fmt">Album · %1$d photos</string>
+    <string name="album_item_empty">Album · No photos yet</string>
+    <string name="sub_delete_album_level">Deletes all photos in this album. Cannot be undone.</string>
+    <string name="unnamed_photo_time_fmt">Unnamed %1$s</string>
+
+    <!-- 备份与恢复 -->
+    <string name="backup_intro">A backup is a single zip file containing all spaces, levels, photos and pins.\n\n· New phone: export on the old phone → transfer via messaging/cloud/cable → import on the new phone\n· Safety net: export a copy regularly</string>
+    <string name="btn_export">Export Backup (create zip file)</string>
+    <string name="btn_import">Import Backup (overwrites local data)</string>
+    <string name="backup_filename_fmt">Nawle-backup-%1$s.zip</string>
+    <string name="toast_no_saf">No file picker available</string>
+    <string name="progress_exporting">Exporting backup…</string>
+    <string name="toast_export_failed_fmt">Export failed: %1$s</string>
+    <string name="toast_export_ok">Exported. Keep the zip file safe.</string>
+    <string name="dlg_import">Import Backup</string>
+    <string name="dlg_import_msg">Importing will overwrite ALL local data (spaces, levels, photos). This cannot be undone.\n\nContinue?</string>
+    <string name="btn_pick_import">Choose File &amp; Import</string>
+    <string name="progress_importing">Importing backup…</string>
+    <string name="toast_import_ok">Import successful</string>
+    <string name="err_bad_format">Invalid backup file format</string>
+    <string name="err_not_backup">This is not a valid Nawle backup file</string>
+    <string name="err_read_failed_fmt">Failed to read backup: %1$s</string>
+    <string name="err_write_failed_fmt">Failed to write data: %1$s</string>
+
+    <!-- 关于页 -->
+    <string name="about_title">About &amp; Contact</string>
+    <string name="about_tagline">Photos + pins on photos record where things are stored, level by level.\nOffline · No permissions · Open source · Free forever</string>
+    <string name="about_contact">Contact the Author</string>
+    <string name="label_email">Email (feedback / suggestions)</string>
+    <string name="label_email_short">Email</string>
+    <string name="btn_copy">Copy</string>
+    <string name="toast_copied_fmt">%1$s copied: %2$s</string>
+    <string name="label_repo">Repo URL</string>
+    <string name="toast_no_browser_repo_copied">No browser found. Repo link copied.</string>
+    <string name="about_qq_title">QQ Group</string>
+    <string name="about_qq_sub">Scan to join: usage tips, feedback and feature requests</string>
+    <string name="about_donate_title">Support the App</string>
+    <string name="about_donate_sub">If this little tool helps you, you can buy the author a coffee ☕</string>
+    <string name="donate_tab_wechat">WeChat</string>
+    <string name="donate_tab_alipay">Alipay</string>
+    <string name="about_license_title">Open Source &amp; Code</string>
+    <string name="about_license_sub">This app is open source under the MIT license, free forever to use, modify and distribute, only requiring the copyright notice to be kept.</string>
+    <string name="btn_license">View License</string>
+    <string name="btn_source">View Source</string>
+</resources>

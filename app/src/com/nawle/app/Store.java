@@ -20,17 +20,26 @@ import java.util.List;
  */
 public class Store {
 
+    /** 普通层级节点：可继续放照片和交互点，无限嵌套 */
+    public static final int KIND_NODE = 0;
+    /** 展开（相册）节点：只能放照片，进入后是网格相册 */
+    public static final int KIND_GALLERY = 1;
+
     public static class Node {
         public long id;
         public long parentId;
         public String name;
         public String note;
+        public int kind;
     }
 
     public static class Pic {
         public long id;
+        public long nodeId;
         public String file;
         public String thumb;
+        public String label;
+        public long createdAt;
     }
 
     public static class Hotspot {
@@ -39,6 +48,8 @@ public class Store {
         public float x;
         public float y;
         public String childName;
+        /** 子节点类型：KIND_NODE / KIND_GALLERY，用于交互点绘制区分 */
+        public int childKind;
     }
 
     private static Store sInstance;
@@ -97,10 +108,15 @@ public class Store {
     // ---------------- 节点 ----------------
 
     public long createNode(long parentId, String name) {
+        return createNode(parentId, name, KIND_NODE);
+    }
+
+    public long createNode(long parentId, String name, int kind) {
         ContentValues v = new ContentValues();
         v.put("parent_id", parentId);
         v.put("name", name);
         v.put("note", "");
+        v.put("kind", kind);
         v.put("created_at", System.currentTimeMillis());
         return w().insert("nodes", null, v);
     }
@@ -118,7 +134,7 @@ public class Store {
     }
 
     public Node node(long id) {
-        try (Cursor c = r().query("nodes", new String[]{"id", "parent_id", "name", "note"},
+        try (Cursor c = r().query("nodes", new String[]{"id", "parent_id", "name", "note", "kind"},
                 "id=?", new String[]{String.valueOf(id)}, null, null, null)) {
             if (c.moveToFirst()) return bindNode(c);
         }
@@ -131,12 +147,13 @@ public class Store {
         n.parentId = c.getLong(1);
         n.name = c.getString(2);
         n.note = c.getString(3);
+        n.kind = c.getInt(4);
         return n;
     }
 
     public List<Node> children(long parentId) {
         List<Node> out = new ArrayList<>();
-        try (Cursor c = r().query("nodes", new String[]{"id", "parent_id", "name", "note"},
+        try (Cursor c = r().query("nodes", new String[]{"id", "parent_id", "name", "note", "kind"},
                 "parent_id=?", new String[]{String.valueOf(parentId)},
                 null, null, "created_at ASC, id ASC")) {
             while (c.moveToNext()) out.add(bindNode(c));
@@ -156,7 +173,7 @@ public class Store {
     public List<Node> searchByName(String q) {
         List<Node> out = new ArrayList<>();
         if (q == null || q.trim().isEmpty()) return out;
-        try (Cursor c = r().query("nodes", new String[]{"id", "parent_id", "name", "note"},
+        try (Cursor c = r().query("nodes", new String[]{"id", "parent_id", "name", "note", "kind"},
                 "name LIKE ?", new String[]{"%" + q.trim() + "%"},
                 null, null, "LENGTH(name) ASC, created_at ASC, id ASC", "50")) {
             while (c.moveToNext()) out.add(bindNode(c));
@@ -220,32 +237,46 @@ public class Store {
 
     public List<Pic> images(long nodeId) {
         List<Pic> out = new ArrayList<>();
-        try (Cursor c = r().query("images", new String[]{"id", "file", "thumb"},
+        try (Cursor c = r().query("images",
+                new String[]{"id", "node_id", "file", "thumb", "label", "created_at"},
                 "node_id=?", new String[]{String.valueOf(nodeId)},
                 null, null, "created_at ASC, id ASC")) {
-            while (c.moveToNext()) {
-                Pic p = new Pic();
-                p.id = c.getLong(0);
-                p.file = c.getString(1);
-                p.thumb = c.getString(2);
-                out.add(p);
-            }
+            while (c.moveToNext()) out.add(bindPic(c));
         }
         return out;
     }
 
     public Pic image(long picId) {
-        try (Cursor c = r().query("images", new String[]{"id", "file", "thumb"},
+        try (Cursor c = r().query("images",
+                new String[]{"id", "node_id", "file", "thumb", "label", "created_at"},
                 "id=?", new String[]{String.valueOf(picId)}, null, null, null)) {
-            if (c.moveToFirst()) {
-                Pic p = new Pic();
-                p.id = c.getLong(0);
-                p.file = c.getString(1);
-                p.thumb = c.getString(2);
-                return p;
-            }
+            if (c.moveToFirst()) return bindPic(c);
         }
         return null;
+    }
+
+    private static Pic bindPic(Cursor c) {
+        Pic p = new Pic();
+        p.id = c.getLong(0);
+        p.nodeId = c.getLong(1);
+        p.file = c.getString(2);
+        p.thumb = c.getString(3);
+        p.label = c.isNull(4) ? "" : c.getString(4);
+        p.createdAt = c.getLong(5);
+        return p;
+    }
+
+    /** 按照片名称模糊搜索（相册里命名的照片），名称短的排前，最多 20 条 */
+    public List<Pic> searchImagesByLabel(String q) {
+        List<Pic> out = new ArrayList<>();
+        if (q == null || q.trim().isEmpty()) return out;
+        try (Cursor c = r().query("images",
+                new String[]{"id", "node_id", "file", "thumb", "label", "created_at"},
+                "label LIKE ?", new String[]{"%" + q.trim() + "%"},
+                null, null, "LENGTH(label) ASC, created_at ASC, id ASC", "20")) {
+            while (c.moveToNext()) out.add(bindPic(c));
+        }
+        return out;
     }
 
     public File imageFile(String name) {
@@ -285,8 +316,10 @@ public class Store {
             pendingFile.delete();
             Pic p = new Pic();
             p.id = id;
+            p.nodeId = nodeId;
             p.file = base;
             p.thumb = base;
+            p.createdAt = v.getAsLong("created_at");
             return p;
         } catch (Exception e) {
             pendingFile.delete();
@@ -306,6 +339,30 @@ public class Store {
         }
     }
 
+    /** 相册内照片命名（网格下方的标题） */
+    public void renameImage(long picId, String label) {
+        ContentValues v = new ContentValues();
+        v.put("label", label == null ? "" : label);
+        w().update("images", v, "id=?", new String[]{String.valueOf(picId)});
+    }
+
+    /** 拖拽排序落定后，按列表顺序重写 created_at（保持 ASC 语义，顺序即持久化） */
+    public void reorderImages(List<Pic> order) {
+        SQLiteDatabase d = w();
+        d.beginTransaction();
+        try {
+            long base = System.currentTimeMillis();
+            for (int i = 0; i < order.size(); i++) {
+                ContentValues v = new ContentValues();
+                v.put("created_at", base - (order.size() - i));
+                d.update("images", v, "id=?", new String[]{String.valueOf(order.get(i).id)});
+            }
+            d.setTransactionSuccessful();
+        } finally {
+            d.endTransaction();
+        }
+    }
+
     public void deleteImage(long picId) {
         Pic p = image(picId);
         if (p == null) return;
@@ -320,7 +377,7 @@ public class Store {
     public List<Hotspot> hotspots(long imageId) {
         List<Hotspot> out = new ArrayList<>();
         try (Cursor c = r().rawQuery(
-                "SELECT h.id, h.child_id, h.x, h.y, n.name FROM hotspots h " +
+                "SELECT h.id, h.child_id, h.x, h.y, n.name, n.kind FROM hotspots h " +
                         "LEFT JOIN nodes n ON n.id = h.child_id " +
                         "WHERE h.image_id=? ORDER BY h.id ASC",
                 new String[]{String.valueOf(imageId)})) {
@@ -331,6 +388,7 @@ public class Store {
                 h.x = (float) c.getDouble(2);
                 h.y = (float) c.getDouble(3);
                 h.childName = c.isNull(4) ? "" : c.getString(4);
+                h.childKind = c.isNull(5) ? KIND_NODE : c.getInt(5);
                 out.add(h);
             }
         }

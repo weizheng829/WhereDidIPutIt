@@ -1,24 +1,331 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
-        <item name="android:colorPrimary">@color/primary</item>
-        <item name="android:colorPrimaryDark">@color/statusBarBg</item>
-        <item name="android:colorAccent">@color/dialogAccent</item>
-        <item name="android:colorControlActivated">@color/dialogAccent</item>
-        <item name="android:colorControlHighlight">@color/controlHighlight</item>
-        <item name="android:statusBarColor">@color/statusBarBg</item>
-        <item name="android:navigationBarColor">@color/navBarBg</item>
-        <item name="android:windowBackground">@color/surface</item>
-        <item name="android:textColorPrimary">@color/onSurface</item>
-        <item name="android:textColorSecondary">@color/onSurfaceVariant</item>
+    <!-- 框架属性 → 主题属性映射（具体色值由各主题 style 提供） -->
+    <style name="AppBase" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:colorPrimary">?attr/primary</item>
+        <item name="android:colorPrimaryDark">?attr/statusBarBg</item>
+        <item name="android:colorAccent">?attr/dialogAccent</item>
+        <item name="android:colorControlActivated">?attr/dialogAccent</item>
+        <item name="android:colorControlHighlight">?attr/controlHighlight</item>
+        <item name="android:statusBarColor">?attr/statusBarBg</item>
+        <item name="android:navigationBarColor">?attr/navBarBg</item>
+        <item name="android:windowBackground">?attr/surface</item>
+        <item name="android:textColorPrimary">?attr/onSurface</item>
+        <item name="android:textColorSecondary">?attr/onSurfaceVariant</item>
         <!-- 关闭系统强制深色，夜间外观完全由 values-night 控制 -->
         <item name="android:forceDarkAllowed">false</item>
-        <item name="android:alertDialogTheme">@style/AppDialog</item>
     </style>
 
+    <!-- ═══ 默认主题：芒果橙 ═══
+         色值引用 @color 资源，昼夜由 colors.xml / values-night 自动切换；
+         API 27+ 导航栏融入页面底色的适配也走 values-v27 的颜色覆盖 -->
+    <style name="AppTheme" parent="AppBase">
+        <item name="android:alertDialogTheme">@style/AppDialog</item>
+        <!-- API 27+：导航栏为浅色时手势条/三键图标用深色；旧系统忽略此项 -->
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="primary">@color/primary</item>
+        <item name="onPrimary">@color/onPrimary</item>
+        <item name="primaryDeep">@color/primaryDeep</item>
+        <item name="primaryContainer">@color/primaryContainer</item>
+        <item name="onPrimaryContainer">@color/onPrimaryContainer</item>
+        <item name="accent">@color/accent</item>
+        <item name="accentDeep">@color/accentDeep</item>
+        <item name="onAccent">@color/onAccent</item>
+        <item name="onDanger">@color/onDanger</item>
+        <item name="surface">@color/surface</item>
+        <item name="cardBg">@color/cardBg</item>
+        <item name="onSurface">@color/onSurface</item>
+        <item name="onSurfaceVariant">@color/onSurfaceVariant</item>
+        <item name="outlineVariant">@color/outlineVariant</item>
+        <item name="divider">@color/divider</item>
+        <item name="headerBg">@color/headerBg</item>
+        <item name="onHeader">@color/onHeader</item>
+        <item name="onHeaderDim">@color/onHeaderDim</item>
+        <item name="onHeaderFaint">@color/onHeaderFaint</item>
+        <item name="statusBarBg">@color/statusBarBg</item>
+        <item name="navBarBg">@color/navBarBg</item>
+        <item name="scrim">@color/scrim</item>
+        <item name="photoBg">@color/photoBg</item>
+        <item name="stripBg">@color/stripBg</item>
+        <item name="hintBarBg">@color/hintBarBg</item>
+        <item name="hintBarText">@color/hintBarText</item>
+        <item name="chipBg">@color/chipBg</item>
+        <item name="chipText">@color/chipText</item>
+        <item name="tileLetter">@color/tileLetter</item>
+        <item name="dialogAccent">@color/dialogAccent</item>
+        <item name="controlHighlight">@color/controlHighlight</item>
+        <item name="arrowDim">@color/arrowDim</item>
+        <item name="crumbPillStroke">@color/crumbPillStroke</item>
+        <item name="danger">@color/danger</item>
+        <item name="selScrim">@color/selScrim</item>
+        <item name="searchBarBg">@color/searchBarBg</item>
+        <item name="searchBarStroke">@color/searchBarStroke</item>
+        <item name="headerPillBg">@color/headerPillBg</item>
+        <item name="headerPillRipple">@color/headerPillRipple</item>
+    </style>
+
+    <!-- ═══ 经典青 Teal（v1.2 旧主题）═══ -->
+    <style name="ThemeApp.Teal" parent="AppBase">
+        <item name="android:alertDialogTheme">@style/AppDialog.Teal</item>
+        <item name="primary">#00897B</item>
+        <item name="onPrimary">#FFFFFF</item>
+        <item name="primaryDeep">#00695C</item>
+        <item name="primaryContainer">#C6EDE8</item>
+        <item name="onPrimaryContainer">#075E56</item>
+        <item name="accent">#FF7043</item>
+        <item name="accentDeep">#BF360C</item>
+        <item name="onAccent">#FFFFFF</item>
+        <item name="onDanger">#FFFFFF</item>
+        <item name="surface">#F2F5F4</item>
+        <item name="cardBg">#FFFFFF</item>
+        <item name="onSurface">#1C2321</item>
+        <item name="onSurfaceVariant">#5C6865</item>
+        <item name="outlineVariant">#E2E8E6</item>
+        <item name="divider">#E2E8E6</item>
+        <item name="headerBg">#00897B</item>
+        <item name="onHeader">#FFFFFF</item>
+        <item name="onHeaderDim">#B3FFFFFF</item>
+        <item name="onHeaderFaint">#80FFFFFF</item>
+        <item name="statusBarBg">#00695C</item>
+        <item name="navBarBg">#00695C</item>
+        <item name="scrim">#B3000000</item>
+        <item name="photoBg">#1C1C1C</item>
+        <item name="stripBg">#121212</item>
+        <item name="hintBarBg">#FFF3E0</item>
+        <item name="hintBarText">#BF360C</item>
+        <item name="chipBg">#D8EFEB</item>
+        <item name="chipText">#085E56</item>
+        <item name="tileLetter">#0B3F3A</item>
+        <item name="dialogAccent">#00897B</item>
+        <item name="controlHighlight">#1E00897B</item>
+        <item name="arrowDim">#C6CDCB</item>
+        <item name="crumbPillStroke">#00000000</item>
+        <item name="danger">#E53935</item>
+        <item name="selScrim">#6600897B</item>
+        <item name="searchBarBg">#FFFFFF</item>
+        <item name="searchBarStroke">#D3DEDB</item>
+        <item name="headerPillBg">#33FFFFFF</item>
+        <item name="headerPillRipple">#40FFFFFF</item>
+    </style>
+
+    <!-- ═══ 烧橙 Burnt Orange（MD3 tone 40，surface 顶栏配深色状态栏图标）═══ -->
+    <style name="ThemeApp.Burnt" parent="AppBase">
+        <item name="android:alertDialogTheme">@style/AppDialog.Burnt</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="primary">#8B5000</item>
+        <item name="onPrimary">#FFFFFF</item>
+        <item name="primaryDeep">#6E4000</item>
+        <item name="primaryContainer">#FFDBC8</item>
+        <item name="onPrimaryContainer">#693D00</item>
+        <item name="accent">#00897B</item>
+        <item name="accentDeep">#00695C</item>
+        <item name="onAccent">#FFFFFF</item>
+        <item name="onDanger">#FFFFFF</item>
+        <item name="surface">#FFF8F3</item>
+        <item name="cardBg">#FFFFFF</item>
+        <item name="onSurface">#221A14</item>
+        <item name="onSurfaceVariant">#52443C</item>
+        <item name="outlineVariant">#D7C2B9</item>
+        <item name="divider">#D7C2B9</item>
+        <item name="headerBg">#FFF8F3</item>
+        <item name="onHeader">#221A14</item>
+        <item name="onHeaderDim">#52443C</item>
+        <item name="onHeaderFaint">#6B5B50</item>
+        <item name="statusBarBg">#FFF8F3</item>
+        <item name="navBarBg">#FFF8F3</item>
+        <item name="scrim">#B3000000</item>
+        <item name="photoBg">#1C1C1C</item>
+        <item name="stripBg">#121212</item>
+        <item name="hintBarBg">#FFF3E0</item>
+        <item name="hintBarText">#8C4A00</item>
+        <item name="chipBg">#B2F1E4</item>
+        <item name="chipText">#00423A</item>
+        <item name="tileLetter">#55443A</item>
+        <item name="dialogAccent">#8B5000</item>
+        <item name="controlHighlight">#1E8B5000</item>
+        <item name="arrowDim">#D8CCC2</item>
+        <item name="crumbPillStroke">#00000000</item>
+        <item name="danger">#E53935</item>
+        <item name="selScrim">#668B5000</item>
+        <item name="searchBarBg">#F1E6DC</item>
+        <item name="searchBarStroke">#E0D2C6</item>
+        <item name="headerPillBg">#29221A14</item>
+        <item name="headerPillRipple">#33221A14</item>
+    </style>
+
+    <!-- ═══ 琥珀 Amber ═══ -->
+    <style name="ThemeApp.Amber" parent="AppBase">
+        <item name="android:alertDialogTheme">@style/AppDialog.Amber</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="primary">#7D5700</item>
+        <item name="onPrimary">#FFFFFF</item>
+        <item name="primaryDeep">#644600</item>
+        <item name="primaryContainer">#FFDE96</item>
+        <item name="onPrimaryContainer">#5B4300</item>
+        <item name="accent">#00897B</item>
+        <item name="accentDeep">#00695C</item>
+        <item name="onAccent">#FFFFFF</item>
+        <item name="onDanger">#FFFFFF</item>
+        <item name="surface">#FFF8EC</item>
+        <item name="cardBg">#FFFFFF</item>
+        <item name="onSurface">#201B0B</item>
+        <item name="onSurfaceVariant">#564729</item>
+        <item name="outlineVariant">#DBC8A8</item>
+        <item name="divider">#DBC8A8</item>
+        <item name="headerBg">#FFF8EC</item>
+        <item name="onHeader">#201B0B</item>
+        <item name="onHeaderDim">#564729</item>
+        <item name="onHeaderFaint">#6B5D42</item>
+        <item name="statusBarBg">#FFF8EC</item>
+        <item name="navBarBg">#FFF8EC</item>
+        <item name="scrim">#B3000000</item>
+        <item name="photoBg">#1C1C1C</item>
+        <item name="stripBg">#121212</item>
+        <item name="hintBarBg">#FFF3E0</item>
+        <item name="hintBarText">#8C6300</item>
+        <item name="chipBg">#B2F1E4</item>
+        <item name="chipText">#00423A</item>
+        <item name="tileLetter">#55452F</item>
+        <item name="dialogAccent">#7D5700</item>
+        <item name="controlHighlight">#1E7D5700</item>
+        <item name="arrowDim">#D9CDB4</item>
+        <item name="crumbPillStroke">#00000000</item>
+        <item name="danger">#E53935</item>
+        <item name="selScrim">#667D5700</item>
+        <item name="searchBarBg">#F5EBD3</item>
+        <item name="searchBarStroke">#E4D8BC</item>
+        <item name="headerPillBg">#29201B0B</item>
+        <item name="headerPillRipple">#33201B0B</item>
+    </style>
+
+    <!-- ═══ 陶土红 Terracotta ═══ -->
+    <style name="ThemeApp.Terracotta" parent="AppBase">
+        <item name="android:alertDialogTheme">@style/AppDialog.Terracotta</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="primary">#8F4936</item>
+        <item name="onPrimary">#FFFFFF</item>
+        <item name="primaryDeep">#73392A</item>
+        <item name="primaryContainer">#FFDBCF</item>
+        <item name="onPrimaryContainer">#6E3523</item>
+        <item name="accent">#00897B</item>
+        <item name="accentDeep">#00695C</item>
+        <item name="onAccent">#FFFFFF</item>
+        <item name="onDanger">#FFFFFF</item>
+        <item name="surface">#FFF8F5</item>
+        <item name="cardBg">#FFFFFF</item>
+        <item name="onSurface">#221A16</item>
+        <item name="onSurfaceVariant">#55433B</item>
+        <item name="outlineVariant">#DCC6BD</item>
+        <item name="divider">#DCC6BD</item>
+        <item name="headerBg">#FFF8F5</item>
+        <item name="onHeader">#221A16</item>
+        <item name="onHeaderDim">#55433B</item>
+        <item name="onHeaderFaint">#6D5A50</item>
+        <item name="statusBarBg">#FFF8F5</item>
+        <item name="navBarBg">#FFF8F5</item>
+        <item name="scrim">#B3000000</item>
+        <item name="photoBg">#1C1C1C</item>
+        <item name="stripBg">#121212</item>
+        <item name="hintBarBg">#FFF3E0</item>
+        <item name="hintBarText">#BF360C</item>
+        <item name="chipBg">#B2F1E4</item>
+        <item name="chipText">#00423A</item>
+        <item name="tileLetter">#554039</item>
+        <item name="dialogAccent">#8F4936</item>
+        <item name="controlHighlight">#1E8F4936</item>
+        <item name="arrowDim">#D9C9C2</item>
+        <item name="crumbPillStroke">#00000000</item>
+        <item name="danger">#E53935</item>
+        <item name="selScrim">#668F4936</item>
+        <item name="searchBarBg">#F4E8E2</item>
+        <item name="searchBarStroke">#E3D3CB</item>
+        <item name="headerPillBg">#29221A16</item>
+        <item name="headerPillRipple">#33221A16</item>
+    </style>
+
+    <!-- ═══ 可可棕 Brown ═══ -->
+    <style name="ThemeApp.Brown" parent="AppBase">
+        <item name="android:alertDialogTheme">@style/AppDialog.Brown</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="primary">#6F5240</item>
+        <item name="onPrimary">#FFFFFF</item>
+        <item name="primaryDeep">#584133</item>
+        <item name="primaryContainer">#FFDBCB</item>
+        <item name="onPrimaryContainer">#574032</item>
+        <item name="accent">#00897B</item>
+        <item name="accentDeep">#00695C</item>
+        <item name="onAccent">#FFFFFF</item>
+        <item name="onDanger">#FFFFFF</item>
+        <item name="surface">#FFF8F4</item>
+        <item name="cardBg">#FFFFFF</item>
+        <item name="onSurface">#221A15</item>
+        <item name="onSurfaceVariant">#55443B</item>
+        <item name="outlineVariant">#DAC4B8</item>
+        <item name="divider">#DAC4B8</item>
+        <item name="headerBg">#FFF8F4</item>
+        <item name="onHeader">#221A15</item>
+        <item name="onHeaderDim">#55443B</item>
+        <item name="onHeaderFaint">#6D5C51</item>
+        <item name="statusBarBg">#FFF8F4</item>
+        <item name="navBarBg">#FFF8F4</item>
+        <item name="scrim">#B3000000</item>
+        <item name="photoBg">#1C1C1C</item>
+        <item name="stripBg">#121212</item>
+        <item name="hintBarBg">#FFF3E0</item>
+        <item name="hintBarText">#7A5A45</item>
+        <item name="chipBg">#B2F1E4</item>
+        <item name="chipText">#00423A</item>
+        <item name="tileLetter">#554039</item>
+        <item name="dialogAccent">#6F5240</item>
+        <item name="controlHighlight">#1E6F5240</item>
+        <item name="arrowDim">#D8CCC3</item>
+        <item name="crumbPillStroke">#00000000</item>
+        <item name="danger">#E53935</item>
+        <item name="selScrim">#666F5240</item>
+        <item name="searchBarBg">#F2E8E1</item>
+        <item name="searchBarStroke">#E2D4C9</item>
+        <item name="headerPillBg">#29221A15</item>
+        <item name="headerPillRipple">#33221A15</item>
+    </style>
+
+    <!-- ═══ 弹窗主题（accent 跟随各主题；夜间由 values-night 覆盖）═══ -->
     <style name="AppDialog" parent="@android:style/Theme.Material.Light.Dialog.Alert">
         <item name="android:colorAccent">@color/dialogAccent</item>
         <item name="android:colorControlActivated">@color/dialogAccent</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+    </style>
+
+    <style name="AppDialog.Teal" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">#00897B</item>
+        <item name="android:colorControlActivated">#00897B</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+    </style>
+
+    <style name="AppDialog.Burnt" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">#8B5000</item>
+        <item name="android:colorControlActivated">#8B5000</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+    </style>
+
+    <style name="AppDialog.Amber" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">#7D5700</item>
+        <item name="android:colorControlActivated">#7D5700</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+    </style>
+
+    <style name="AppDialog.Terracotta" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">#8F4936</item>
+        <item name="android:colorControlActivated">#8F4936</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+    </style>
+
+    <style name="AppDialog.Brown" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">#6F5240</item>
+        <item name="android:colorControlActivated">#6F5240</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
     </style>
 </resources>

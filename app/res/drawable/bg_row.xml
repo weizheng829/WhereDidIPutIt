@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 无底色圆角涟漪：用于弹窗内的整行可点区域 -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/controlHighlight">
+    android:color="?attr/controlHighlight">
     <item android:id="@android:id/mask">
         <shape android:shape="rectangle">
             <solid android:color="#FFFFFF" />

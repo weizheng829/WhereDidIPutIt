@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 品牌青色系（夜间：亮青底 + 深青字） -->
-    <color name="primary">#6FD5C9</color>
-    <color name="onPrimary">#003733</color>
-    <color name="primaryDeep">#00695C</color>
-    <color name="primaryContainer">#21514B</color>
-    <color name="onPrimaryContainer">#A2EBE1</color>
-    <color name="accent">#D84315</color>
-    <color name="accentDeep">#BF360C</color>
+    <!-- 品牌芒果橙系（夜间：暖深可可底 + 亮芒果字） -->
+    <color name="primary">#F4B264</color>
+    <color name="onPrimary">#4E2B00</color>
+    <color name="primaryDeep">#D9821B</color>
+    <color name="primaryContainer">#4F3413</color>
+    <color name="onPrimaryContainer">#F6C68C</color>
+    <color name="accent">#4DB6AC</color>
+    <color name="accentDeep">#00695C</color>
+    <color name="onAccent">#FFFFFF</color>
+    <color name="onDanger">#FFFFFF</color>
 
     <!-- 表面与文字 -->
-    <color name="surface">#101413</color>
-    <color name="cardBg">#1C211F</color>
-    <color name="onSurface">#E2E8E6</color>
-    <color name="onSurfaceVariant">#9CA8A5</color>
-    <color name="outlineVariant">#2B3230</color>
-    <color name="divider">#2B3230</color>
+    <color name="surface">#171108</color>
+    <color name="cardBg">#231A0E</color>
+    <color name="onSurface">#F2EADF</color>
+    <color name="onSurfaceVariant">#B4A491</color>
+    <color name="outlineVariant">#38291A</color>
+    <color name="divider">#38291A</color>
 
     <!-- 头部 / 系统栏 -->
-    <color name="headerBg">#0F332F</color>
+    <color name="headerBg">#331F0B</color>
     <color name="onHeader">#FFFFFF</color>
     <color name="onHeaderDim">#B3FFFFFF</color>
     <color name="onHeaderFaint">#80FFFFFF</color>
-    <color name="statusBarBg">#0A2723</color>
-    <color name="navBarBg">#0A2723</color>
+    <color name="statusBarBg">#221407</color>
+    <!-- API 26 及以下；API 27+ 用 values-night-v27 融入页面底色 -->
+    <color name="navBarBg">#221407</color>
     <color name="scrim">#B3000000</color>
 
     <!-- 照片区（深浅色一致） -->
@@ -31,32 +34,34 @@
     <color name="stripBg">#0E0E0E</color>
 
     <!-- 功能色 -->
-    <color name="hintBarBg">#3A241A</color>
-    <color name="hintBarText">#FFB59B</color>
-    <color name="chipBg">#224A44</color>
-    <color name="chipText">#93DCD2</color>
-    <color name="tileLetter">#0B3F3A</color>
-    <color name="dialogAccent">#64D8CB</color>
-    <color name="controlHighlight">#336FD5C9</color>
-    <color name="arrowDim">#5A6563</color>
-    <color name="crumbPillStroke">#406FD5C9</color>
+    <color name="hintBarBg">#3A2A18</color>
+    <color name="hintBarText">#FFC896</color>
+    <color name="chipBg">#4F3413</color>
+    <color name="chipText">#F6C68C</color>
+    <color name="tileLetter">#5C3A10</color>
+    <color name="dialogAccent">#F4B264</color>
+    <color name="controlHighlight">#33F4B264</color>
+    <color name="arrowDim">#6B5A48</color>
+    <color name="crumbPillStroke">#40F4B264</color>
 
     <!-- 侧边栏菜单图标 -->
     <color name="iconBackup">#6FB1F7</color>
     <color name="iconSettings">#FFB74D</color>
     <color name="iconAbout">#F48FB1</color>
     <color name="iconUpdate">#81C784</color>
+    <color name="iconLanguage">#4DD0E1</color>
 
     <!-- 功能图标 -->
     <color name="iconAppearance">#CE93D8</color>
     <color name="iconDanger">#EF9A9A</color>
     <color name="iconNeutral">#90A4AE</color>
-    <color name="sheetHandle">#4A5553</color>
+    <color name="sheetHandle">#4A3E30</color>
 
-    <!-- 首页搜索框（头部上的输入区）：夜间用亮一档的底 + 描边，与深青头部区分 -->
-    <color name="searchBarBg">#24332E</color>
-    <color name="searchBarStroke">#44514D</color>
+    <!-- 首页搜索框（头部上的输入区）：夜间用亮一档的底 + 描边，与深色头部区分 -->
+    <color name="searchBarBg">#452F0F</color>
+    <color name="searchBarStroke">#63481C</color>
 
-    <!-- 头部胶囊按钮（管理 / 全选） -->
+    <!-- 头部胶囊按钮（选择 / 全选）：深可可头部上保持白色玻璃底 + 白色涟漪 -->
     <color name="headerPillBg">#33FFFFFF</color>
+    <color name="headerPillRipple">#40FFFFFF</color>
 </resources>

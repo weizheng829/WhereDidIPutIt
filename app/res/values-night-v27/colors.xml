@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- API 27+ 夜间：导航栏同样融入页面深色底 -->
+    <color name="navBarBg">@color/surface</color>
+</resources>

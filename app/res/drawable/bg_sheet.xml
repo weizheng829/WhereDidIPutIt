@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 底部操作面板：仅上方两角圆角，下边缘贴屏幕底 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="@color/cardBg" />
+    <solid android:color="?attr/cardBg" />
     <corners android:topLeftRadius="24dp" android:topRightRadius="24dp"
         android:bottomLeftRadius="0dp" android:bottomRightRadius="0dp" />
 </shape>

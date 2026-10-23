@@ -47,21 +47,19 @@ public final class Backup {
         box.setPadding(pad, Ui.dp(act, 8), pad, Ui.dp(act, 6));
 
         TextView msg = new TextView(act);
-        msg.setText("备份是包含全部空间、层级、照片和交互点的一个 zip 文件。\n\n" +
-                "· 换手机：旧手机导出 → 微信/网盘/数据线传到新手机 → 新手机导入\n" +
-                "· 防丢失：建议每隔一段时间导出一份留存");
+        msg.setText(act.getString(R.string.backup_intro));
         msg.setTextSize(14);
-        msg.setTextColor(act.getResources().getColor(R.color.onSurfaceVariant));
+        msg.setTextColor(Ui.color(act, R.attr.onSurfaceVariant));
         box.addView(msg);
 
         Button btnExport = new Button(act);
-        btnExport.setText("导出备份（生成 zip 文件）");
+        btnExport.setText(act.getString(R.string.btn_export));
         btnExport.setAllCaps(false);
-        btnExport.setTextColor(act.getResources().getColor(R.color.onPrimary));
+        btnExport.setTextColor(Ui.color(act, R.attr.onPrimary));
         btnExport.setTextSize(15);
         btnExport.setBackgroundResource(R.drawable.bg_btn_primary);
         btnExport.setCompoundDrawablesWithIntrinsicBounds(
-                act.getResources().getDrawable(R.drawable.ic_upload_white), null, null, null);
+                act.getResources().getDrawable(R.drawable.ic_upload), null, null, null);
         btnExport.setCompoundDrawablePadding(Ui.dp(act, 8));
         LinearLayout.LayoutParams lp1 = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, Ui.dp(act, 48));
@@ -70,9 +68,9 @@ public final class Backup {
         box.addView(btnExport);
 
         Button btnImport = new Button(act);
-        btnImport.setText("导入备份（覆盖本机现有数据）");
+        btnImport.setText(act.getString(R.string.btn_import));
         btnImport.setAllCaps(false);
-        btnImport.setTextColor(0xFFFFFFFF);
+        btnImport.setTextColor(Ui.color(act, R.attr.onAccent));
         btnImport.setTextSize(15);
         btnImport.setBackgroundResource(R.drawable.bg_btn_accent);
         btnImport.setCompoundDrawablesWithIntrinsicBounds(
@@ -95,9 +93,9 @@ public final class Backup {
         });
 
         holder[0] = new AlertDialog.Builder(act)
-                .setTitle("备份与恢复")
+                .setTitle(act.getString(R.string.menu_backup))
                 .setView(box)
-                .setNegativeButton("取消", null)
+                .setNegativeButton(act.getString(R.string.btn_cancel), null)
                 .show();
     }
 
@@ -105,8 +103,8 @@ public final class Backup {
 
     public static void startExport(Activity act) {
         Store.get(act).checkpoint();
-        String name = "收哪了-备份-" +
-                new SimpleDateFormat("yyyyMMdd-HHmm", Locale.CHINA).format(new Date()) + ".zip";
+        String name = act.getString(R.string.backup_filename_fmt,
+                new SimpleDateFormat("yyyyMMdd-HHmm", Locale.CHINA).format(new Date()));
         Intent it = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         it.addCategory(Intent.CATEGORY_OPENABLE);
         it.setType(MIME_ZIP);
@@ -114,12 +112,12 @@ public final class Backup {
         try {
             act.startActivityForResult(it, REQ_EXPORT);
         } catch (Exception e) {
-            Ui.toast(act, "没有可用的文件选择器");
+            Ui.toast(act, act.getString(R.string.toast_no_saf));
         }
     }
 
     private static void runExport(final Activity act, final Uri target) {
-        final AlertDialog pd = Ui.progress(act, "正在导出备份…");
+        final AlertDialog pd = Ui.progress(act, act.getString(R.string.progress_exporting));
         pd.show();
         new Thread(() -> {
             String err = null;
@@ -144,7 +142,7 @@ public final class Backup {
                     addDir(zos, st.thumbDir, "thumbs");
                 }
             } catch (Exception e) {
-                err = "导出失败：" + e.getMessage();
+                err = act.getString(R.string.toast_export_failed_fmt, e.getMessage());
             }
             final String e2 = err;
             act.runOnUiThread(() -> {
@@ -152,7 +150,7 @@ public final class Backup {
                     pd.dismiss();
                 } catch (Throwable ignored) {
                 }
-                Ui.toast(act, e2 == null ? "导出成功，请妥善保存该 zip 文件" : e2);
+                Ui.toast(act, e2 == null ? act.getString(R.string.toast_export_ok) : e2);
             });
         }).start();
     }
@@ -176,9 +174,9 @@ public final class Backup {
     // ---------------- 导入 ----------------
 
     public static void startImport(final Activity act) {
-        Ui.confirm(act, "导入备份",
-                "将用备份文件覆盖本机现有全部数据（空间、层级、照片），覆盖后无法恢复。\n\n确定继续吗？",
-                "选择文件并导入", () -> {
+        Ui.confirm(act, act.getString(R.string.dlg_import),
+                act.getString(R.string.dlg_import_msg),
+                act.getString(R.string.btn_pick_import), () -> {
                     Intent it = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                     it.addCategory(Intent.CATEGORY_OPENABLE);
                     it.setType(MIME_ZIP);
@@ -186,13 +184,13 @@ public final class Backup {
                     try {
                         act.startActivityForResult(it, REQ_IMPORT);
                     } catch (Exception e) {
-                        Ui.toast(act, "没有可用的文件选择器");
+                        Ui.toast(act, act.getString(R.string.toast_no_saf));
                     }
                 });
     }
 
     private static void runImport(final Activity act, final Uri src) {
-        final AlertDialog pd = Ui.progress(act, "正在导入备份…");
+        final AlertDialog pd = Ui.progress(act, act.getString(R.string.progress_importing));
         pd.show();
         new Thread(() -> {
             String err = importSync(act, src);
@@ -202,7 +200,7 @@ public final class Backup {
                 } catch (Throwable ignored) {
                 }
                 if (err == null) {
-                    Ui.toast(act, "导入成功");
+                    Ui.toast(act, act.getString(R.string.toast_import_ok));
                     Intent it = new Intent(act, MainActivity.class);
                     it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     act.startActivity(it);
@@ -226,7 +224,7 @@ public final class Backup {
             int files = 0;
             while ((e = zis.getNextEntry()) != null) {
                 String name = e.getName();
-                if (name.contains("..") || name.startsWith("/")) return "备份文件格式不合法";
+                if (name.contains("..") || name.startsWith("/")) return act.getString(R.string.err_bad_format);
                 File out;
                 if (name.equals(DB_NAME) || name.startsWith("databases/")) {
                     out = new File(staging, DB_NAME);
@@ -250,11 +248,11 @@ public final class Backup {
             }
             if (!new File(staging, DB_NAME).exists() || files == 0) {
                 deleteRecursive(staging);
-                return "这不是有效的「收哪了」备份文件";
+                return act.getString(R.string.err_not_backup);
             }
         } catch (Exception ex) {
             deleteRecursive(staging);
-            return "读取备份失败：" + ex.getMessage();
+            return act.getString(R.string.err_read_failed_fmt, ex.getMessage());
         }
 
         // 第二步：校验通过，替换本机数据
@@ -283,7 +281,7 @@ public final class Backup {
             deleteRecursive(staging);
             return null;
         } catch (Exception ex) {
-            return "写入数据失败：" + ex.getMessage();
+            return act.getString(R.string.err_write_failed_fmt, ex.getMessage());
         }
     }
 

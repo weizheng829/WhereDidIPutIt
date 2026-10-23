@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/controlHighlight">
-    <item android:drawable="@color/cardBg" />
+    android:color="?attr/controlHighlight">
+    <item android:drawable="?attr/cardBg" />
 </ripple>

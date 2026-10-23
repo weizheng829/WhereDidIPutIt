@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 品牌青色系 -->
-    <color name="primary">#00897B</color>
-    <color name="onPrimary">#FFFFFF</color>
-    <color name="primaryDeep">#00695C</color>
-    <color name="primaryContainer">#C6EDE8</color>
-    <color name="onPrimaryContainer">#075E56</color>
-    <color name="accent">#FF7043</color>
-    <color name="accentDeep">#BF360C</color>
+    <!-- 品牌芒果橙系（暖色主调，点缀青色互补） -->
+    <color name="primary">#EE9436</color>
+    <color name="onPrimary">#4A2C00</color>
+    <color name="primaryDeep">#D9821B</color>
+    <color name="primaryContainer">#F9E7CC</color>
+    <color name="onPrimaryContainer">#7A4A0D</color>
+    <color name="accent">#00897B</color>
+    <color name="accentDeep">#00695C</color>
+    <!-- 每个「容器色」配自己的 on 色：accentDeep/danger 底上一律用白字白图标 -->
+    <color name="onAccent">#FFFFFF</color>
+    <color name="onDanger">#FFFFFF</color>
 
     <!-- 表面与文字 -->
-    <color name="surface">#F2F5F4</color>
+    <color name="surface">#FDF7EE</color>
     <color name="cardBg">#FFFFFF</color>
-    <color name="onSurface">#1C2321</color>
-    <color name="onSurfaceVariant">#5C6865</color>
-    <color name="outlineVariant">#E2E8E6</color>
-    <color name="divider">#E2E8E6</color>
+    <color name="onSurface">#251C10</color>
+    <color name="onSurfaceVariant">#75614A</color>
+    <color name="outlineVariant">#EBDCC5</color>
+    <color name="divider">#EBDCC5</color>
 
-    <!-- 头部 / 系统栏 -->
-    <color name="headerBg">#00897B</color>
-    <color name="onHeader">#FFFFFF</color>
-    <color name="onHeaderDim">#B3FFFFFF</color>
-    <color name="onHeaderFaint">#80FFFFFF</color>
-    <color name="statusBarBg">#00695C</color>
-    <color name="navBarBg">#00695C</color>
+    <!-- 头部 / 系统栏（浅芒果底配深棕字；文字用实色不用透明度，保证小字对比度） -->
+    <color name="headerBg">#EE9436</color>
+    <color name="onHeader">#4A2C00</color>
+    <color name="onHeaderDim">#543408</color>
+    <color name="onHeaderFaint">#5F3D0E</color>
+    <color name="statusBarBg">#D9821B</color>
+    <!-- API 26 及以下的导航栏色；API 27+ 用 values-v27 融入页面底色 -->
+    <color name="navBarBg">#D9821B</color>
     <color name="scrim">#B3000000</color>
 
     <!-- 照片区（深浅色一致） -->
@@ -33,32 +37,35 @@
     <!-- 功能色 -->
     <color name="hintBarBg">#FFF3E0</color>
     <color name="hintBarText">#BF360C</color>
-    <color name="chipBg">#D8EFEB</color>
-    <color name="chipText">#085E56</color>
-    <color name="tileLetter">#0B3F3A</color>
-    <color name="dialogAccent">#00897B</color>
-    <color name="controlHighlight">#1E00897B</color>
-    <color name="arrowDim">#C6CDCB</color>
+    <color name="chipBg">#F9E7CC</color>
+    <color name="chipText">#8A5A10</color>
+    <color name="tileLetter">#5C3A10</color>
+    <color name="dialogAccent">#D9821B</color>
+    <color name="controlHighlight">#1ED9821B</color>
+    <color name="arrowDim">#D8CBBB</color>
     <color name="crumbPillStroke">#00000000</color>
     <color name="danger">#E53935</color>
-    <color name="selScrim">#6600897B</color>
+    <color name="selScrim">#66EE9436</color>
 
     <!-- 侧边栏菜单图标 -->
     <color name="iconBackup">#1E88E5</color>
     <color name="iconSettings">#F57C00</color>
     <color name="iconAbout">#E91E63</color>
     <color name="iconUpdate">#43A047</color>
+    <color name="iconLanguage">#00838F</color>
 
     <!-- 功能图标 -->
     <color name="iconAppearance">#8E24AA</color>
     <color name="iconDanger">#E53935</color>
     <color name="iconNeutral">#607D8B</color>
-    <color name="sheetHandle">#C6CDCB</color>
+    <color name="sheetHandle">#D8CBBB</color>
 
     <!-- 首页搜索框（头部上的输入区） -->
     <color name="searchBarBg">#FFFFFF</color>
-    <color name="searchBarStroke">#D3DEDB</color>
+    <color name="searchBarStroke">#EAD9C2</color>
 
-    <!-- 头部胶囊按钮（管理 / 全选） -->
-    <color name="headerPillBg">#33FFFFFF</color>
+    <!-- 头部胶囊按钮（选择 / 全选）：onPrimary 深棕低透明度玻璃底 + 同色系涟漪，
+         与头部深棕文字同一色调（MD3 tonal button on primary） -->
+    <color name="headerPillBg">#294A2C00</color>
+    <color name="headerPillRipple">#334A2C00</color>
 </resources>

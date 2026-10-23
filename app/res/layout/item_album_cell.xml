@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="2dp">
+
+    <FrameLayout
+        android:id="@+id/imgWrap"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="?attr/outlineVariant">
+
+        <ImageView
+            android:id="@+id/img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="@null" />
+
+        <!-- 每张照片的「⋮」：命名 / 删除的可见入口 -->
+        <ImageView
+            android:id="@+id/btnMore"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_more_chip"
+            android:src="@drawable/ic_more_vert"
+            android:scaleType="center"
+            android:contentDescription="@string/cd_more" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="10.5sp"
+        android:textColor="?attr/onSurfaceVariant"
+        android:visibility="gone" />
+</LinearLayout>

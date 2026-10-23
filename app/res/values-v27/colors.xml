@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- API 27+：导航栏融入页面底色（surface 随昼夜自动切换），
+         配合 windowLightNavigationBar，全面屏手势区域不再出现突兀色条；
+         API 26 及以下仍用 values/colors.xml 的深青色，保证三键图标可见 -->
+    <color name="navBarBg">@color/surface</color>
+</resources>

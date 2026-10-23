@@ -3,13 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/surface">
+    android:background="?attr/surface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="@color/headerBg"
+        android:background="?attr/headerBg"
         android:gravity="center_vertical"
         android:elevation="4dp">
 
@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/about_title"
-            android:textColor="@color/onHeader"
+            android:textColor="?attr/onHeader"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="@string/app_name"
-                    android:textColor="@color/onSurface"
+                    android:textColor="?attr/onSurface"
                     android:textSize="21sp"
                     android:textStyle="bold" />
 
@@ -71,7 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:textColor="@color/onSurfaceVariant"
+                    android:textColor="?attr/onSurfaceVariant"
                     android:textSize="13sp" />
 
                 <TextView
@@ -81,7 +81,7 @@
                     android:gravity="center"
                     android:lineSpacingExtra="3dp"
                     android:text="@string/about_tagline"
-                    android:textColor="@color/onSurfaceVariant"
+                    android:textColor="?attr/onSurfaceVariant"
                     android:textSize="13sp" />
             </LinearLayout>
 
@@ -97,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/about_contact"
-                    android:textColor="@color/onSurface"
+                    android:textColor="?attr/onSurface"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -118,14 +118,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/label_email"
-                            android:textColor="@color/onSurfaceVariant"
+                            android:textColor="?attr/onSurfaceVariant"
                             android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/tvEmail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/onSurface"
+                            android:textColor="?attr/onSurface"
                             android:textSize="15sp" />
                     </LinearLayout>
 
@@ -139,7 +139,7 @@
                         android:paddingTop="6dp"
                         android:paddingBottom="6dp"
                         android:text="@string/btn_copy"
-                        android:textColor="@color/chipText"
+                        android:textColor="?attr/chipText"
                         android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -157,7 +157,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/about_qq_title"
-                    android:textColor="@color/onSurface"
+                    android:textColor="?attr/onSurface"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -166,7 +166,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/about_qq_sub"
-                    android:textColor="@color/onSurfaceVariant"
+                    android:textColor="?attr/onSurfaceVariant"
                     android:textSize="13sp" />
 
                 <ImageView
@@ -192,7 +192,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/about_donate_title"
-                    android:textColor="@color/onSurface"
+                    android:textColor="?attr/onSurface"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -202,8 +202,42 @@
                     android:layout_marginTop="4dp"
                     android:lineSpacingExtra="3dp"
                     android:text="@string/about_donate_sub"
-                    android:textColor="@color/onSurfaceVariant"
+                    android:textColor="?attr/onSurfaceVariant"
                     android:textSize="13sp" />
+
+                <!-- 微信 / 支付宝切换 -->
+                <LinearLayout
+                    android:layout_width="240dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tabWechat"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:text="@string/donate_tab_wechat"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tabAlipay"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:text="@string/donate_tab_alipay"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <ImageView
                     android:id="@+id/qrDonate"
@@ -228,7 +262,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/about_license_title"
-                    android:textColor="@color/onSurface"
+                    android:textColor="?attr/onSurface"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -237,7 +271,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/about_license_sub"
-                    android:textColor="@color/onSurfaceVariant"
+                    android:textColor="?attr/onSurfaceVariant"
                     android:textSize="13sp" />
 
                 <LinearLayout
@@ -256,7 +290,7 @@
                         android:paddingTop="6dp"
                         android:paddingBottom="6dp"
                         android:text="@string/btn_license"
-                        android:textColor="@color/chipText"
+                        android:textColor="?attr/chipText"
                         android:textSize="13sp" />
 
                     <TextView
@@ -270,7 +304,7 @@
                         android:paddingTop="6dp"
                         android:paddingBottom="6dp"
                         android:text="@string/btn_source"
-                        android:textColor="@color/chipText"
+                        android:textColor="?attr/chipText"
                         android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -282,7 +316,7 @@
                 android:layout_marginTop="18dp"
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
-                android:textColor="@color/onSurfaceVariant"
+                android:textColor="?attr/onSurfaceVariant"
                 android:textSize="12sp" />
         </LinearLayout>
     </ScrollView>

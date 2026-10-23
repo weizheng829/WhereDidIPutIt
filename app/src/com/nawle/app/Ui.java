@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public final class Ui {
     private Ui() {}
@@ -37,8 +39,8 @@ public final class Ui {
     public static final int THEME_LIGHT = 1;
     public static final int THEME_DARK = 2;
 
-    /** 偏好变更序号：各 Activity 在 onResume 对比，不一致则 recreate 换肤 */
-    private static volatile int themeSeq = 0;
+    /** 偏好变更序号：各 Activity 在 onResume 对比，不一致则 recreate（主题、语言共用） */
+    private static volatile int uiSeq = 0;
 
     public static int themePref(Context c) {
         return c.getSharedPreferences("app", Context.MODE_PRIVATE).getInt("theme", THEME_SYSTEM);
@@ -46,11 +48,67 @@ public final class Ui {
 
     public static void setThemePref(Context c, int mode) {
         c.getSharedPreferences("app", Context.MODE_PRIVATE).edit().putInt("theme", mode).apply();
-        themeSeq++;
+        uiSeq++;
     }
 
-    public static int themeSeq() {
-        return themeSeq;
+    /** 语言偏好（跟随系统 / 中文 / English），与主题共用同一变更序号 */
+    public static final int LANG_SYSTEM = 0;
+    public static final int LANG_ZH = 1;
+    public static final int LANG_EN = 2;
+
+    public static int langPref(Context c) {
+        return c.getSharedPreferences("app", Context.MODE_PRIVATE).getInt("lang", LANG_SYSTEM);
+    }
+
+    public static void setLangPref(Context c, int lang) {
+        c.getSharedPreferences("app", Context.MODE_PRIVATE).edit().putInt("lang", lang).apply();
+        uiSeq++;
+    }
+
+    public static int uiSeq() {
+        return uiSeq;
+    }
+
+    // ---------------- 配色方案（主题风格）----------------
+
+    public static final int PALETTE_MANGO = 0;   // 芒果橙（默认）
+    public static final int PALETTE_TEAL = 1;    // 经典青
+    public static final int PALETTE_BURNT = 2;   // 烧橙（MD3 tone 40）
+    public static final int PALETTE_AMBER = 3;   // 琥珀
+    public static final int PALETTE_TERRA = 4;   // 陶土红
+    public static final int PALETTE_BROWN = 5;   // 可可棕
+
+    /** 主题清单：style 资源 + 名称 + 选择弹窗里的色板（浅/深两颗主色，与昼夜无关地展示目标主题） */
+    public static final int[] PALETTE_STYLES = {
+            R.style.AppTheme, R.style.ThemeApp_Teal, R.style.ThemeApp_Burnt,
+            R.style.ThemeApp_Amber, R.style.ThemeApp_Terracotta, R.style.ThemeApp_Brown};
+    public static final int[] PALETTE_NAMES = {
+            R.string.theme_mango, R.string.theme_teal, R.string.theme_burnt,
+            R.string.theme_amber, R.string.theme_terracotta, R.string.theme_brown};
+    /** 弹窗色板：{主色, 深主色}，取各主题浅色模式的值 */
+    public static final int[][] PALETTE_SWATCH = {
+            {0xFFEE9436, 0xFFD9821B}, {0xFF00897B, 0xFF00695C}, {0xFF8B5000, 0xFF6E4000},
+            {0xFF7D5700, 0xFF644600}, {0xFF8F4936, 0xFF73392A}, {0xFF6F5240, 0xFF584133}};
+
+    public static int palettePref(Context c) {
+        return c.getSharedPreferences("app", Context.MODE_PRIVATE).getInt("palette", PALETTE_MANGO);
+    }
+
+    public static void setPalettePref(Context c, int palette) {
+        c.getSharedPreferences("app", Context.MODE_PRIVATE).edit().putInt("palette", palette).apply();
+        uiSeq++;
+    }
+
+    /** 当前配色 + 当前昼夜对应的主题 style，Activity 在 onCreate 里 setTheme */
+    public static int themeStyle(Context c) {
+        return PALETTE_STYLES[palettePref(c)];
+    }
+
+    /** 读取当前主题的主题属性色值（替代 getResources().getColor，颜色随主题切换） */
+    public static int color(Context c, int attr) {
+        TypedValue tv = new TypedValue();
+        c.getTheme().resolveAttribute(attr, tv, true);
+        return tv.data;
     }
 
     /**
@@ -65,6 +123,18 @@ public final class Ui {
                 ? Configuration.UI_MODE_NIGHT_YES : Configuration.UI_MODE_NIGHT_NO;
         if ((cfg.uiMode & Configuration.UI_MODE_NIGHT_MASK) == night) return base;
         cfg.uiMode = (cfg.uiMode & ~Configuration.UI_MODE_NIGHT_MASK) | night;
+        return base.createConfigurationContext(cfg);
+    }
+
+    /**
+     * 在 Activity.attachBaseContext 里调用：按用户偏好覆盖语言资源，
+     * 使应用内语言可以独立于系统语言。
+     */
+    public static Context wrapLocale(Context base) {
+        int lang = langPref(base);
+        if (lang == LANG_SYSTEM) return base;
+        Configuration cfg = new Configuration(base.getResources().getConfiguration());
+        cfg.setLocale(lang == LANG_ZH ? Locale.SIMPLIFIED_CHINESE : Locale.ENGLISH);
         return base.createConfigurationContext(cfg);
     }
 
@@ -94,7 +164,7 @@ public final class Ui {
         et.setText(initial);
         if (initial != null) et.setSelection(initial.length());
         et.setTextSize(15.5f);
-        et.setTextColor(c.getResources().getColor(R.color.onSurface));
+        et.setTextColor(Ui.color(c, R.attr.onSurface));
         et.setInputType(multiline
                 ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 : InputType.TYPE_CLASS_TEXT);
@@ -121,7 +191,7 @@ public final class Ui {
             final ImageView clear = new ImageView(c);
             clear.setImageResource(R.drawable.ic_clear);
             clear.setImageTintList(ColorStateList.valueOf(
-                    c.getResources().getColor(R.color.onSurfaceVariant)));
+                    Ui.color(c, R.attr.onSurfaceVariant)));
             clear.setPadding(dp(c, 12), dp(c, 12), dp(c, 12), dp(c, 12));
             clear.setOnClickListener(v -> et.setText(""));
             clear.setVisibility(initial != null && initial.length() > 0
@@ -150,14 +220,14 @@ public final class Ui {
         final AlertDialog dlg = new AlertDialog.Builder(c)
                 .setTitle(title)
                 .setView(wrap)
-                .setPositiveButton("确定", null)
-                .setNegativeButton("取消", null)
+                .setPositiveButton(c.getString(R.string.btn_ok), null)
+                .setNegativeButton(c.getString(R.string.btn_cancel), null)
                 .create();
         dlg.setOnShowListener(d -> ((AlertDialog) d).getButton(AlertDialog.BUTTON_POSITIVE)
                 .setOnClickListener(v -> {
                     String s = et.getText().toString().trim();
                     if (s.isEmpty()) {
-                        toast(c, "内容不能为空");
+                        toast(c, c.getString(R.string.toast_empty_input));
                         return;
                     }
                     dlg.dismiss();
@@ -171,7 +241,7 @@ public final class Ui {
                 .setTitle(title)
                 .setMessage(msg)
                 .setPositiveButton(okLabel, (d, w) -> onOk.run())
-                .setNegativeButton("取消", null)
+                .setNegativeButton(c.getString(R.string.btn_cancel), null)
                 .show();
     }
 
@@ -187,7 +257,7 @@ public final class Ui {
         TextView tv = new TextView(c);
         tv.setText(msg);
         tv.setTextSize(15);
-        tv.setTextColor(c.getResources().getColor(R.color.onSurfaceVariant));
+        tv.setTextColor(Ui.color(c, R.attr.onSurfaceVariant));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.leftMargin = dp(c, 20);
@@ -216,6 +286,16 @@ public final class Ui {
         return s.isEmpty() ? "·" : s.substring(0, 1);
     }
 
+    /** 「N 个子层级 · M 张照片」组合副标题；两者皆无时为「还没有内容」 */
+    public static String subCounts(Context c, int kids, int pics) {
+        if (kids == 0 && pics == 0) return c.getString(R.string.sub_empty);
+        StringBuilder sb = new StringBuilder();
+        if (kids > 0) sb.append(c.getString(R.string.fmt_sublevels, kids));
+        if (kids > 0 && pics > 0) sb.append(" · ");
+        if (pics > 0) sb.append(c.getString(R.string.fmt_pics, pics));
+        return sb.toString();
+    }
+
     // ---------------- 底部操作面板 ----------------
 
     public static Sheet sheet(Activity act, String title, String subtitle) {
@@ -232,6 +312,7 @@ public final class Ui {
         private final Activity act;
         private final String title, sub;
         private final List<Row> rows = new ArrayList<>();
+        private final List<View> customRows = new ArrayList<>();
 
         private static final class Row {
             String label, sub;
@@ -257,7 +338,10 @@ public final class Ui {
             w.label = label;
             w.sub = sub;
             w.iconRes = iconRes;
-            w.color = act.getResources().getColor(colorRes);
+            // 传 R.color.primary 表示跟随当前主题主色，其余为固定图标色
+            w.color = colorRes == R.color.primary
+                    ? color(act, R.attr.primary)
+                    : act.getResources().getColor(colorRes);
             w.run = r;
             rows.add(w);
             return this;
@@ -285,6 +369,12 @@ public final class Ui {
             w.tileBg = tileColor;
             w.run = r;
             rows.add(w);
+            return this;
+        }
+
+        /** 插入完全自定义的行（如主题选择器的色板行），追加在所有行之后 */
+        public Sheet custom(View v) {
+            customRows.add(v);
             return this;
         }
 
@@ -319,7 +409,7 @@ public final class Ui {
                 t.setText(title);
                 t.setTextSize(16.5f);
                 t.setTypeface(Typeface.DEFAULT_BOLD);
-                t.setTextColor(c.getResources().getColor(R.color.onSurface));
+                t.setTextColor(Ui.color(c, R.attr.onSurface));
                 t.setGravity(Gravity.CENTER);
                 t.setPadding(dp(c, 24), 0, dp(c, 24), 0);
                 t.setMaxLines(1);
@@ -333,7 +423,7 @@ public final class Ui {
                     TextView s = new TextView(c);
                     s.setText(sub);
                     s.setTextSize(12.5f);
-                    s.setTextColor(c.getResources().getColor(R.color.onSurfaceVariant));
+                    s.setTextColor(Ui.color(c, R.attr.onSurfaceVariant));
                     s.setGravity(Gravity.CENTER);
                     s.setPadding(dp(c, 24), 0, dp(c, 24), 0);
                     LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(
@@ -344,7 +434,7 @@ public final class Ui {
             }
 
             final View dim = new View(c);
-            dim.setBackgroundColor(c.getResources().getColor(R.color.scrim));
+            dim.setBackgroundColor(Ui.color(c, R.attr.scrim));
             dim.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
@@ -369,6 +459,9 @@ public final class Ui {
             for (int i = 0; i < rows.size(); i++) {
                 list.addView(rowView(c, rows.get(i), dismiss));
             }
+            for (int i = 0; i < customRows.size(); i++) {
+                list.addView(customRows.get(i));
+            }
             CappedScrollView scroller = new CappedScrollView(c,
                     c.getResources().getDisplayMetrics().heightPixels * 5 / 8);
             scroller.setVerticalScrollBarEnabled(false);
@@ -379,7 +472,7 @@ public final class Ui {
 
             // 底部取消
             View dv = new View(c);
-            dv.setBackgroundColor(c.getResources().getColor(R.color.divider));
+            dv.setBackgroundColor(Ui.color(c, R.attr.divider));
             LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, dp(c, 1));
             dlp.leftMargin = dp(c, 18);
@@ -388,10 +481,10 @@ public final class Ui {
             sheet.addView(dv, dlp);
 
             final TextView cancel = new TextView(c);
-            cancel.setText("取消");
+            cancel.setText(c.getString(R.string.btn_cancel));
             cancel.setTextSize(15);
             cancel.setTypeface(Typeface.DEFAULT_BOLD);
-            cancel.setTextColor(c.getResources().getColor(R.color.primary));
+            cancel.setTextColor(Ui.color(c, R.attr.primary));
             cancel.setGravity(Gravity.CENTER);
             cancel.setPadding(0, dp(c, 15), 0, dp(c, 20));
             cancel.setBackgroundResource(R.drawable.bg_row);
@@ -458,7 +551,7 @@ public final class Ui {
                 letter.setText(firstChar(r.label));
                 letter.setTextSize(19);
                 letter.setTypeface(Typeface.DEFAULT_BOLD);
-                letter.setTextColor(c.getResources().getColor(R.color.tileLetter));
+                letter.setTextColor(Ui.color(c, R.attr.tileLetter));
                 letter.setGravity(Gravity.CENTER);
                 letter.setBackground(tile);
                 LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(dp(c, 40), dp(c, 40));
@@ -471,15 +564,16 @@ public final class Ui {
             TextView label = new TextView(c);
             label.setText(r.label);
             label.setTextSize(15.5f);
-            label.setTextColor(c.getResources().getColor(
-                    r.danger ? R.color.iconDanger : R.color.onSurface));
+            label.setTextColor(r.danger
+                    ? act.getResources().getColor(R.color.iconDanger)
+                    : color(c, R.attr.onSurface));
             if (r.danger) label.setTypeface(Typeface.DEFAULT_BOLD);
             txt.addView(label);
             if (r.sub != null) {
                 TextView s = new TextView(c);
                 s.setText(r.sub);
                 s.setTextSize(12);
-                s.setTextColor(c.getResources().getColor(R.color.onSurfaceVariant));
+                s.setTextColor(Ui.color(c, R.attr.onSurfaceVariant));
                 s.setPadding(0, dp(c, 2), 0, 0);
                 txt.addView(s);
             }

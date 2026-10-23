@@ -16,3 +16,8 @@ toolchain/
 *.log
 *.tmp
 .DS_Store
+
+# 本地设计草稿与主题预览（不入库）
+logo-drafts/
+theme-compare.html
+theme-preview.html

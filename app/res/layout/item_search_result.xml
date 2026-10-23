@@ -16,9 +16,19 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:gravity="center"
-        android:textColor="@color/tileLetter"
+        android:textColor="?attr/tileLetter"
         android:textSize="19sp"
         android:textStyle="bold"
+        android:contentDescription="@null" />
+
+    <!-- 照片搜索结果行：缩略图替代首字母色块 -->
+    <ImageView
+        android:id="@+id/photoTile"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_photo_tile"
+        android:visibility="gone"
         android:contentDescription="@null" />
 
     <LinearLayout
@@ -34,7 +44,7 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end"
-            android:textColor="@color/onSurface"
+            android:textColor="?attr/onSurface"
             android:textSize="15.5sp"
             android:textStyle="bold" />
 
@@ -45,7 +55,7 @@
             android:layout_marginTop="2dp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:textColor="@color/onSurfaceVariant"
+            android:textColor="?attr/onSurfaceVariant"
             android:textSize="12sp" />
     </LinearLayout>
 
@@ -54,6 +64,6 @@
         android:layout_height="20dp"
         android:layout_marginLeft="10dp"
         android:src="@drawable/ic_chevron_right"
-        android:tint="@color/arrowDim"
+        android:tint="?attr/arrowDim"
         android:contentDescription="@null" />
 </LinearLayout>

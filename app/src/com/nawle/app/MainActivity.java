@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
     /** 按缩略图文件名缓存：层级页换封面后回首页能立即刷新 */
     private final Map<String, Bitmap> thumbCache = new HashMap<>();
     private Store store;
-    private int themeSeqApplied;
+    private int uiSeqApplied;
 
     /** 批量选择删除：右上角「选择」进入选择态，选择态内再「全选/取消全选」 */
     private final Set<Long> selected = new HashSet<>();
@@ -48,23 +48,27 @@ public class MainActivity extends Activity {
     private TextView tvTitle, btnSelDelete, btnSelect, btnSelectAll;
     private View fab, selBar;
 
-    /** 名称搜索：输入即时出结果，点结果直达该层级 */
+    /** 名称搜索：输入即时出结果，点结果直达该层级；也搜相册里命名的照片 */
     private EditText etSearch;
     private View searchPanel;
     private ListView searchList;
     private Drawable searchIcon, clearIcon;
     private final List<Store.Node> searchResults = new ArrayList<>();
     private final List<String> searchLocs = new ArrayList<>();
+    /** 照片搜索结果（按名称命中的相册照片），与节点结果合并展示 */
+    private final List<Store.Pic> picResults = new ArrayList<>();
+    private final List<String> picLocs = new ArrayList<>();
 
     @Override
     protected void attachBaseContext(Context base) {
-        super.attachBaseContext(Ui.wrapTheme(base));
-        themeSeqApplied = Ui.themeSeq();
+        super.attachBaseContext(Ui.wrapLocale(Ui.wrapTheme(base)));
+        uiSeqApplied = Ui.uiSeq();
     }
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        setTheme(Ui.themeStyle(this));
         setContentView(R.layout.activity_main);
         store = Store.get(this);
         seedIfNeeded();
@@ -75,6 +79,20 @@ public class MainActivity extends Activity {
         selBar = findViewById(R.id.selBar);
         btnSelDelete = findViewById(R.id.btnSelDelete);
         fab = findViewById(R.id.fab);
+        // 底部悬浮件避让手势条：在基础下边距上叠加导航栏 insets
+        // （系统已让出导航栏时 insets 为 0，仅取布局基础值；edge-to-edge 布局时取实际高度）
+        ViewGroup.MarginLayoutParams selLp = (ViewGroup.MarginLayoutParams) selBar.getLayoutParams();
+        selBar.setOnApplyWindowInsetsListener((v, ins) -> {
+            selLp.bottomMargin = Ui.dp(this, 28) + ins.getSystemWindowInsetBottom();
+            v.requestLayout();
+            return ins;
+        });
+        ViewGroup.MarginLayoutParams fabLp = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
+        fab.setOnApplyWindowInsetsListener((v, ins) -> {
+            fabLp.bottomMargin = Ui.dp(this, 24) + ins.getSystemWindowInsetBottom();
+            v.requestLayout();
+            return ins;
+        });
 
         grid = findViewById(R.id.grid);
         adapter = new SpaceAdapter();
@@ -98,9 +116,10 @@ public class MainActivity extends Activity {
         grid.setEmptyView(findViewById(R.id.empty));
 
         fab.setOnClickListener(v ->
-                Ui.promptText(this, "新建收纳空间", "例如：卧室、阳台、储物间", "", false, name -> {
+                Ui.promptText(this, getString(R.string.dlg_new_space),
+                        getString(R.string.hint_new_space), "", false, name -> {
                     store.createNode(0, name);
-                    Ui.toast(this, "已创建「" + name + "」，点开它添加照片吧");
+                    Ui.toast(this, getString(R.string.toast_space_created_fmt, name));
                     reload();
                 }));
 
@@ -150,7 +169,7 @@ public class MainActivity extends Activity {
     private void seedIfNeeded() {
         SharedPreferences sp = getSharedPreferences("app", MODE_PRIVATE);
         if (!sp.getBoolean("seeded", false)) {
-            String[] names = {"卧室", "客厅", "阳台", "办公室"};
+            String[] names = getResources().getStringArray(R.array.seed_spaces);
             for (String n : names) store.createNode(0, n);
             sp.edit().putBoolean("seeded", true).apply();
         }
@@ -159,7 +178,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (themeSeqApplied != Ui.themeSeq()) recreate();
+        if (uiSeqApplied != Ui.uiSeq()) recreate();
         reload();
     }
 
@@ -192,7 +211,7 @@ public class MainActivity extends Activity {
         SharedPreferences sp = getSharedPreferences("app", MODE_PRIVATE);
         if (sp.getBoolean("tip_longpress_main", false)) return;
         sp.edit().putBoolean("tip_longpress_main", true).apply();
-        Ui.toast(this, "小提示：长按卡片可重命名或删除空间");
+        Ui.toast(this, getString(R.string.tip_longpress_main));
     }
 
     // ---------------- 搜索 ----------------
@@ -207,10 +226,10 @@ public class MainActivity extends Activity {
         // 搜索图标作复合Drawable：代码里缩放并着色，兼容低版本
         searchIcon = getResources().getDrawable(R.drawable.ic_search);
         searchIcon.setBounds(0, 0, Ui.dp(this, 18), Ui.dp(this, 18));
-        searchIcon.setTint(getResources().getColor(R.color.primary));
+        searchIcon.setTint(Ui.color(this, R.attr.primary));
         clearIcon = getResources().getDrawable(R.drawable.ic_clear);
         clearIcon.setBounds(0, 0, Ui.dp(this, 16), Ui.dp(this, 16));
-        clearIcon.setTint(getResources().getColor(R.color.onSurfaceVariant));
+        clearIcon.setTint(Ui.color(this, R.attr.onSurfaceVariant));
         etSearch.setCompoundDrawables(searchIcon, null, null, null);
         etSearch.setCompoundDrawablePadding(Ui.dp(this, 8));
 
@@ -242,16 +261,28 @@ public class MainActivity extends Activity {
             }
             return false;
         });
-        searchList.setOnItemClickListener((p, v, pos, id) -> openNode(searchResults.get(pos).id));
+        searchList.setOnItemClickListener((p, v, pos, id) -> {
+            if (pos < searchResults.size()) {
+                openNode(searchResults.get(pos).id);
+            } else {
+                openPic(picResults.get(pos - searchResults.size()));
+            }
+        });
     }
 
     private void runSearch(String q) {
         searchResults.clear();
         searchLocs.clear();
+        picResults.clear();
+        picLocs.clear();
         if (!q.isEmpty()) {
             for (Store.Node n : store.searchByName(q)) {
                 searchResults.add(n);
                 searchLocs.add(locationOf(n));
+            }
+            for (Store.Pic pic : store.searchImagesByLabel(q)) {
+                picResults.add(pic);
+                picLocs.add(locationOfPic(pic));
             }
         }
         ((BaseAdapter) searchList.getAdapter()).notifyDataSetChanged();
@@ -266,7 +297,17 @@ public class MainActivity extends Activity {
             if (sb.length() > 0) sb.append(" › ");
             sb.append(chain.get(i).name);
         }
-        return sb.length() == 0 ? "位于首页的收纳空间" : sb.toString();
+        return sb.length() == 0 ? getString(R.string.search_loc_top) : sb.toString();
+    }
+
+    /** 照片结果行的位置文本：完整路径含所在相册名 */
+    private String locationOfPic(Store.Pic pic) {
+        StringBuilder sb = new StringBuilder();
+        for (Store.Node n : store.path(pic.nodeId)) {
+            if (sb.length() > 0) sb.append(" › ");
+            sb.append(n.name);
+        }
+        return sb.toString();
     }
 
     /** 携带完整层级链跳转：返回键可逐级回退，面包屑也正确 */
@@ -284,6 +325,22 @@ public class MainActivity extends Activity {
                 .putExtra(NodeActivity.EXTRA_PATH_IDS, ids));
     }
 
+    /** 照片结果直达：进入所在相册并定位到这张照片的大图 */
+    private void openPic(Store.Pic pic) {
+        List<Store.Node> chain = store.path(pic.nodeId);
+        if (chain.isEmpty()) {
+            // 相册已被删除（结果过期）：刷新结果列表
+            runSearch(etSearch.getText().toString().trim());
+            return;
+        }
+        long[] ids = new long[chain.size()];
+        for (int i = 0; i < ids.length; i++) ids[i] = chain.get(i).id;
+        hideKeyboard();
+        startActivity(new Intent(this, NodeActivity.class)
+                .putExtra(NodeActivity.EXTRA_PATH_IDS, ids)
+                .putExtra(NodeActivity.EXTRA_PIC_ID, pic.id));
+    }
+
     private void clearSearch() {
         hideKeyboard();
         etSearch.setText(""); // 触发 TextWatcher，面板随之隐藏
@@ -297,38 +354,80 @@ public class MainActivity extends Activity {
 
     class SearchAdapter extends BaseAdapter {
 
+        private static final int TYPE_NODE = 0;
+        private static final int TYPE_PIC = 1;
+
         @Override
         public int getCount() {
-            return searchResults.size();
+            return searchResults.size() + picResults.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return searchResults.get(i);
+            return i < searchResults.size() ? searchResults.get(i) : picResults.get(i - searchResults.size());
         }
 
         @Override
         public long getItemId(int i) {
-            return searchResults.get(i).id;
+            return i < searchResults.size() ? searchResults.get(i).id
+                    : picResults.get(i - searchResults.size()).id;
         }
 
         @Override
-        public View getView(int i, View cv, ViewGroup parent) {
+        public int getViewTypeCount() {
+            return 2;
+        }
+
+        @Override
+        public int getItemViewType(int pos) {
+            return pos < searchResults.size() ? TYPE_NODE : TYPE_PIC;
+        }
+
+        @Override
+        public View getView(int pos, View cv, ViewGroup parent) {
             View v = cv;
             if (v == null) {
                 v = LayoutInflater.from(MainActivity.this)
                         .inflate(R.layout.item_search_result, parent, false);
+                // 圆角缩略图：按背景 outline 裁剪
+                ImageView pt = v.findViewById(R.id.photoTile);
+                pt.setClipToOutline(true);
+                pt.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
             }
-            Store.Node n = searchResults.get(i);
             TextView tile = v.findViewById(R.id.tile);
-            tile.setText(Ui.firstChar(n.name));
-            GradientDrawable bg = new GradientDrawable();
-            bg.setShape(GradientDrawable.RECTANGLE);
-            bg.setCornerRadius(Ui.dp(MainActivity.this, 13));
-            bg.setColor(Ui.tileColor(n.id));
-            tile.setBackground(bg);
-            ((TextView) v.findViewById(R.id.name)).setText(n.name);
-            ((TextView) v.findViewById(R.id.loc)).setText(searchLocs.get(i));
+            ImageView photoTile = v.findViewById(R.id.photoTile);
+            TextView name = v.findViewById(R.id.name);
+            TextView loc = v.findViewById(R.id.loc);
+            if (getItemViewType(pos) == TYPE_NODE) {
+                Store.Node n = searchResults.get(pos);
+                GradientDrawable bg = new GradientDrawable();
+                bg.setShape(GradientDrawable.RECTANGLE);
+                bg.setCornerRadius(Ui.dp(MainActivity.this, 13));
+                bg.setColor(Ui.tileColor(n.id));
+                tile.setText(Ui.firstChar(n.name));
+                tile.setBackground(bg);
+                tile.setVisibility(View.VISIBLE);
+                photoTile.setVisibility(View.GONE);
+                name.setText(n.name);
+                loc.setText(searchLocs.get(pos));
+            } else {
+                int pi = pos - searchResults.size();
+                Store.Pic pic = picResults.get(pi);
+                Bitmap bmp = thumbCache.get(pic.thumb);
+                if (bmp == null) {
+                    File tf = store.thumbFile(pic.thumb);
+                    if (tf.exists()) {
+                        bmp = Store.decodeScaled(tf, 200);
+                        if (bmp != null) thumbCache.put(pic.thumb, bmp);
+                    }
+                }
+                if (bmp != null) photoTile.setImageBitmap(bmp);
+                else photoTile.setImageDrawable(null);
+                tile.setVisibility(View.GONE);
+                photoTile.setVisibility(View.VISIBLE);
+                name.setText(pic.label);
+                loc.setText(picLocs.get(pi));
+            }
             return v;
         }
     }
@@ -354,7 +453,8 @@ public class MainActivity extends Activity {
         btnSelect.setVisibility(!selectMode && !spaces.isEmpty() ? View.VISIBLE : View.GONE);
         btnSelectAll.setVisibility(selectMode ? View.VISIBLE : View.GONE);
         btnSelectAll.setText(all ? R.string.deselect_all : R.string.select_all);
-        if (selectMode) tvTitle.setText(any ? "已选 " + selected.size() + " 项" : "请选择要删除的空间");
+        if (selectMode) tvTitle.setText(any ? getString(R.string.sel_count_fmt, selected.size())
+                : getString(R.string.sel_pick_hint));
         else tvTitle.setText(R.string.app_name);
         fab.setVisibility(selectMode ? View.GONE : View.VISIBLE);
         selBar.setVisibility(selectMode ? View.VISIBLE : View.GONE);
@@ -365,12 +465,12 @@ public class MainActivity extends Activity {
     private void confirmDeleteSelected() {
         if (selected.isEmpty()) return;
         final List<Long> ids = new ArrayList<>(selected);
-        Ui.confirm(this, "删除所选空间",
-                "将删除所选 " + ids.size() + " 个空间及其全部子层级、照片和交互点，不可恢复。",
-                "删除", () -> {
+        Ui.confirm(this, getString(R.string.dlg_delete_selected),
+                getString(R.string.dlg_delete_selected_msg_fmt, ids.size()),
+                getString(R.string.btn_delete), () -> {
                     for (long id : ids) store.deleteNodeDeep(id);
                     thumbCache.clear();
-                    Ui.toast(this, "已删除 " + ids.size() + " 个空间");
+                    Ui.toast(this, getString(R.string.toast_deleted_fmt, ids.size()));
                     exitSelectMode();
                     reload();
                 });
@@ -379,21 +479,19 @@ public class MainActivity extends Activity {
     private void showSpaceMenu(Store.Node n) {
         int kids = store.countChildren(n.id);
         int pics = store.images(n.id).size();
-        String sub;
-        if (kids == 0 && pics == 0) sub = "还没有内容";
-        else sub = (kids > 0 ? kids + " 个子层级" : "")
-                + (kids > 0 && pics > 0 ? " · " : "")
-                + (pics > 0 ? pics + " 张照片" : "");
+        String sub = Ui.subCounts(this, kids, pics);
         Ui.sheet(this, n.name, sub)
-                .item("重命名", R.drawable.ic_edit, R.color.primary, () ->
-                        Ui.promptText(this, "重命名空间", "", n.name, false, s -> {
+                .item(getString(R.string.act_rename), R.drawable.ic_edit, R.color.primary, () ->
+                        Ui.promptText(this, getString(R.string.dlg_rename_space), "",
+                                n.name, false, s -> {
                             store.renameNode(n.id, s);
                             reload();
                         }))
-                .danger("删除空间", "将删除全部子层级和照片，不可恢复", () ->
-                        Ui.confirm(this, "删除空间",
-                                "将删除「" + n.name + "」及其所有子层级、照片，不可恢复。",
-                                "删除", () -> {
+                .danger(getString(R.string.dlg_delete_space),
+                        getString(R.string.sub_delete_subtree), () ->
+                        Ui.confirm(this, getString(R.string.dlg_delete_space),
+                                getString(R.string.dlg_delete_subtree_msg_fmt, n.name),
+                                getString(R.string.btn_delete), () -> {
                                     store.deleteNodeDeep(n.id);
                                     reload();
                                 }))
@@ -436,9 +534,10 @@ public class MainActivity extends Activity {
             List<Store.Pic> pics = store.images(n.id);
             int kids = store.countChildren(n.id);
             StringBuilder sb = new StringBuilder();
-            if (kids > 0) sb.append(kids).append(" 个收纳位 · ");
-            sb.append(pics.isEmpty() ? "还没照片" : pics.size() + " 张照片");
-            if (n.note != null && !n.note.trim().isEmpty()) sb.append(" · 备");
+            if (kids > 0) sb.append(getString(R.string.fmt_storages, kids)).append(" · ");
+            sb.append(pics.isEmpty() ? getString(R.string.no_photos_yet)
+                    : getString(R.string.fmt_pics, pics.size()));
+            if (n.note != null && !n.note.trim().isEmpty()) sb.append(getString(R.string.note_marker));
             sub.setText(sb.toString());
 
             Bitmap bmp = null;

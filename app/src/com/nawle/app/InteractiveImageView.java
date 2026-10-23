@@ -27,6 +27,9 @@ public class InteractiveImageView extends View {
         void onHotspotLongPress(Store.Hotspot h);
 
         void onImageTap(float xPct, float yPct);
+
+        /** 长按落在照片空白处（未命中交互点） */
+        void onImageLongPress();
     }
 
     private Bitmap bitmap;
@@ -45,6 +48,9 @@ public class InteractiveImageView extends View {
     private final Paint pEmpty = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rectTmp = new RectF();
     private final RectF haloTmp = new RectF();
+    /** 空状态画布文字：构造时按当前语言缓存，避免每帧查资源 */
+    private String emptyNoPhotos;
+    private String emptyNeedPhoto;
 
     private ScaleGestureDetector scaleDetector;
     private GestureDetector gestureDetector;
@@ -65,6 +71,8 @@ public class InteractiveImageView extends View {
     }
 
     private void init(Context c) {
+        emptyNoPhotos = c.getString(R.string.empty_no_photos);
+        emptyNeedPhoto = c.getString(R.string.empty_need_photo);
         // 交互点下的暗色光晕，保证亮色照片上也能看清
         pHalo.setColor(Color.argb(70, 0, 0, 0));
         pFill.setColor(Color.argb(215, 255, 255, 255));
@@ -113,7 +121,11 @@ public class InteractiveImageView extends View {
             @Override
             public void onLongPress(MotionEvent e) {
                 Store.Hotspot hit = hitHotspot(e.getX(), e.getY());
-                if (hit != null && host != null) host.onHotspotLongPress(hit);
+                if (hit != null) {
+                    if (host != null) host.onHotspotLongPress(hit);
+                } else if (host != null && bitmap != null) {
+                    host.onImageLongPress();
+                }
             }
 
             @Override
@@ -250,7 +262,7 @@ public class InteractiveImageView extends View {
             if (dx * dx + dy * dy <= r * r) return h;
             String label = labelFor(h);
             if (!label.isEmpty()) {
-                pillRectInto(pts[0], pts[1], label, rectTmp);
+                pillRectInto(pts[0], pts[1], label, isGallery(h), rectTmp);
                 rectTmp.inset(-touch, -touch);
                 if (rectTmp.contains(sx, sy)) return h;
             }
@@ -262,7 +274,7 @@ public class InteractiveImageView extends View {
     protected void onDraw(Canvas c) {
         super.onDraw(c);
         if (bitmap == null) {
-            String s = placementMode ? "请先添加照片，再放置交互点" : "暂无照片";
+            String s = placementMode ? emptyNeedPhoto : emptyNoPhotos;
             c.drawText(s, getWidth() / 2f, getHeight() / 2f, pEmpty);
             return;
         }
@@ -271,22 +283,27 @@ public class InteractiveImageView extends View {
             float[] pts = {h.x * bitmap.getWidth(), h.y * bitmap.getHeight()};
             matrix.mapPoints(pts);
             String label = labelFor(h);
+            boolean gallery = isGallery(h);
             if (label.isEmpty()) {
                 float r = hotspotRadius();
                 c.drawCircle(pts[0], pts[1], r + Ui.dp(getContext(), 3.5f), pHalo);
                 c.drawCircle(pts[0], pts[1], r, pFill);
                 c.drawCircle(pts[0], pts[1], r, pStroke);
-                float ty = pts[1] - (pLabel.ascent() + pLabel.descent()) / 2f;
-                c.drawText("•", pts[0], ty, pLabel);
+                if (gallery) {
+                    drawGridGlyph(c, pts[0], pts[1], r * 0.62f);
+                } else {
+                    float ty = pts[1] - (pLabel.ascent() + pLabel.descent()) / 2f;
+                    c.drawText("•", pts[0], ty, pLabel);
+                }
             } else {
-                drawLabelPill(c, pts[0], pts[1], label);
+                drawLabelPill(c, pts[0], pts[1], label, gallery);
             }
         }
     }
 
-    /** 有名字的交互点画成胶囊标签，完整展示名字而不是只取首字 */
-    private void drawLabelPill(Canvas c, float cx, float cy, String label) {
-        pillRectInto(cx, cy, label, rectTmp);
+    /** 有名字的交互点画成胶囊标签，完整展示名字而不是只取首字；相册点在名字前带网格图标 */
+    private void drawLabelPill(Canvas c, float cx, float cy, String label, boolean gallery) {
+        pillRectInto(cx, cy, label, gallery, rectTmp);
         haloTmp.set(rectTmp);
         float grow = Ui.dp(getContext(), 3.5f);
         haloTmp.inset(-grow, -grow);
@@ -295,13 +312,39 @@ public class InteractiveImageView extends View {
         c.drawRoundRect(rectTmp, corner, corner, pFill);
         c.drawRoundRect(rectTmp, corner, corner, pStroke);
         float ty = cy - (pLabel.ascent() + pLabel.descent()) / 2f;
-        c.drawText(label, cx, ty, pLabel);
+        if (gallery) {
+            float glyph = Ui.dp(getContext(), 11);
+            float gap = Ui.dp(getContext(), 5);
+            float pad = Ui.dp(getContext(), 10);
+            drawGridGlyph(c, rectTmp.left + pad + glyph / 2f, cy, glyph / 2f);
+            c.drawText(label, rectTmp.left + pad + glyph + gap
+                    + pLabel.measureText(label) / 2f, ty, pLabel);
+        } else {
+            c.drawText(label, cx, ty, pLabel);
+        }
     }
 
-    private void pillRectInto(float cx, float cy, String label, RectF out) {
-        float w = pLabel.measureText(label) + Ui.dp(getContext(), 10) * 2;
+    private void pillRectInto(float cx, float cy, String label, boolean gallery, RectF out) {
+        float w = pLabel.measureText(label) + Ui.dp(getContext(), 10) * 2
+                + (gallery ? Ui.dp(getContext(), 11) + Ui.dp(getContext(), 5) : 0);
         float hgt = (pLabel.descent() - pLabel.ascent()) + Ui.dp(getContext(), 7) * 2;
         out.set(cx - w / 2f, cy - hgt / 2f, cx + w / 2f, cy + hgt / 2f);
+    }
+
+    /** 2×2 网格小图标：展开（相册）交互点的标识，与普通收纳点的「•」区分 */
+    private void drawGridGlyph(Canvas c, float cx, float cy, float half) {
+        float gap = half * 0.36f;
+        float side = (half * 2 - gap) / 2f;
+        float left = cx - half, top = cy - half;
+        c.drawRoundRect(left, top, left + side, top + side, 1.5f, 1.5f, pLabel);
+        c.drawRoundRect(left + side + gap, top, left + half * 2, top + side, 1.5f, 1.5f, pLabel);
+        c.drawRoundRect(left, top + side + gap, left + side, top + half * 2, 1.5f, 1.5f, pLabel);
+        c.drawRoundRect(left + side + gap, top + side + gap, left + half * 2, top + half * 2,
+                1.5f, 1.5f, pLabel);
+    }
+
+    private static boolean isGallery(Store.Hotspot h) {
+        return h.childKind == Store.KIND_GALLERY;
     }
 
     /** 名字过长时截断加省略号，避免标签超出屏幕；空串表示未命名 */

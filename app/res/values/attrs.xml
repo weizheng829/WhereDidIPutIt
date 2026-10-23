@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 主题颜色属性：布局/图标引用 ?attr/xxx，具体色值由各主题 style（ThemeApp.*）提供。
+     colors.xml 保留为默认「芒果橙」主题的资源，其余主题的色值直接写在 styles.xml 里。 -->
+<resources>
+    <!-- 品牌主色系 -->
+    <attr name="primary" format="color" />
+    <attr name="onPrimary" format="color" />
+    <attr name="primaryDeep" format="color" />
+    <attr name="primaryContainer" format="color" />
+    <attr name="onPrimaryContainer" format="color" />
+    <attr name="accent" format="color" />
+    <attr name="accentDeep" format="color" />
+    <attr name="onAccent" format="color" />
+    <attr name="onDanger" format="color" />
+
+    <!-- 表面与文字 -->
+    <attr name="surface" format="color" />
+    <attr name="cardBg" format="color" />
+    <attr name="onSurface" format="color" />
+    <attr name="onSurfaceVariant" format="color" />
+    <attr name="outlineVariant" format="color" />
+    <attr name="divider" format="color" />
+
+    <!-- 头部 / 系统栏 -->
+    <attr name="headerBg" format="color" />
+    <attr name="onHeader" format="color" />
+    <attr name="onHeaderDim" format="color" />
+    <attr name="onHeaderFaint" format="color" />
+    <attr name="statusBarBg" format="color" />
+    <attr name="navBarBg" format="color" />
+    <attr name="scrim" format="color" />
+
+    <!-- 照片区 -->
+    <attr name="photoBg" format="color" />
+    <attr name="stripBg" format="color" />
+
+    <!-- 功能色 -->
+    <attr name="hintBarBg" format="color" />
+    <attr name="hintBarText" format="color" />
+    <attr name="chipBg" format="color" />
+    <attr name="chipText" format="color" />
+    <attr name="tileLetter" format="color" />
+    <attr name="dialogAccent" format="color" />
+    <attr name="controlHighlight" format="color" />
+    <attr name="arrowDim" format="color" />
+    <attr name="crumbPillStroke" format="color" />
+    <attr name="danger" format="color" />
+    <attr name="selScrim" format="color" />
+
+    <!-- 首页搜索框 -->
+    <attr name="searchBarBg" format="color" />
+    <attr name="searchBarStroke" format="color" />
+
+    <!-- 头部胶囊按钮 -->
+    <attr name="headerPillBg" format="color" />
+    <attr name="headerPillRipple" format="color" />
+</resources>
